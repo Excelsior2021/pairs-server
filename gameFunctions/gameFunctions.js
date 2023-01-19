@@ -1,8 +1,70 @@
-import player from "./playerFunctions.js"
-import deck from "./deckFunctions.js"
-// import { dispatchGameAction } from "../components/MultiplayerSession/MultiplayerSession"
+const createDeck = () => {
+  const deck = []
+  const non_num_cards = ["ace", "jack", "queen", "king"]
+  const suits = ["clubs", "diamonds", "hearts", "spades"]
 
-export const initialPairs = hand => {
+  for (const x of [...Array(9).keys()]) {
+    for (const suit of suits) {
+      const id = `${x + 2}_of_${suit}`
+      const img = `_${id}`
+      deck.push({
+        id,
+        value: x + 2,
+        suit,
+        img,
+      })
+    }
+  }
+
+  for (const value of non_num_cards) {
+    if (value !== "ace") {
+      for (const suit of suits) {
+        const id = `${value}_of_${suit}`
+        const img = `_${id}`
+        deck.push({
+          id,
+          value,
+          suit,
+          img,
+        })
+      }
+    }
+  }
+
+  for (const suit of suits.reverse()) {
+    const id = `ace_of_${suit}`
+    const img = `_${id}`
+    deck.unshift({
+      id,
+      value: "ace",
+      suit,
+      img,
+    })
+  }
+  return deck
+}
+
+const shuffleDeck = deck => {
+  const shuffledDeck = [...deck]
+  for (const x in shuffledDeck) {
+    const y = Math.floor(Math.random() * parseInt(x))
+    const temp = shuffledDeck[x]
+    shuffledDeck[x] = shuffledDeck[y]
+    shuffledDeck[y] = temp
+  }
+  return shuffledDeck
+}
+
+const dealTopCard = deck => deck.shift()
+
+const dealHand = (deck, handSize) => {
+  const hand = []
+  while (hand.length < handSize) hand.push(dealTopCard(deck))
+
+  return hand
+}
+
+const initialPairs = hand => {
   let pairs = []
   hand.forEach(cardX =>
     hand.forEach(cardY => {
@@ -27,11 +89,11 @@ export const initialPairs = hand => {
 }
 
 export const startGame = () => {
-  const newDeck = deck.createDeck()
-  const shuffledDeck = deck.shuffleDeck(newDeck)
+  const newDeck = createDeck()
+  const shuffledDeck = shuffleDeck(newDeck)
 
-  const player1Hand = deck.dealHand(shuffledDeck, 7)
-  const player2Hand = deck.dealHand(shuffledDeck, 7)
+  const player1Hand = dealHand(shuffledDeck, 7)
+  const player2Hand = dealHand(shuffledDeck, 7)
 
   const player1Pairs = initialPairs(player1Hand)
   const player2Pairs = initialPairs(player2Hand)
@@ -148,7 +210,6 @@ export const handleDealtCard = (
 }
 
 export default {
-  initialPairs,
   startGame,
   handlePlayerMatchPairs,
   handleDealtCard,

@@ -1,8 +1,7 @@
 import express from "express"
 import { createServer } from "http"
 import { Server } from "socket.io"
-import pairs from "./gameFunctions/pairsFunctions.js"
-import deck, { shuffleDeck } from "./gameFunctions/deckFunctions.js"
+import game from "./gameFunctions/gameFunctions.js"
 
 const app = express()
 const httpServer = createServer(app)
@@ -22,7 +21,7 @@ io.on("connection", socket => {
   if (players.length <= 2) socket.emit("setPlayer", players.length)
 
   if (players.length === 2) {
-    const initialGameState = pairs.startGame()
+    const initialGameState = game.startGame()
     const playerTurn = "player1"
     io.emit("start", initialGameState, playerTurn)
   }
@@ -35,7 +34,7 @@ io.on("connection", socket => {
   socket.on(
     "player_match",
     (playerRequest, playerMatch, gameState, playerOutput) => {
-      const newGameState = pairs.handlePlayerMatchPairs(
+      const newGameState = game.handlePlayerMatchPairs(
         playerRequest,
         playerMatch,
         gameState
@@ -52,7 +51,7 @@ io.on("connection", socket => {
   socket.on(
     "player_dealt",
     (dealtCard, shuffledDeck, playerRequest, gameState) => {
-      const { gameState: newGameState, playerOutput } = pairs.handleDealtCard(
+      const { gameState: newGameState, playerOutput } = game.handleDealtCard(
         dealtCard,
         shuffledDeck,
         playerRequest,
