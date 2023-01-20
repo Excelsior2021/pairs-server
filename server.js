@@ -66,11 +66,9 @@ io.on("connection", socket => {
     socket.broadcast.emit("player_response_message", playerOutput)
   )
 
-  socket.on("player_turn_switch", player => {
-    let playerTurn
-    player === "player1" ? (playerTurn = "player2") : (playerTurn = player)
-    socket.broadcast.emit("player_turn_switch", playerTurn)
-  })
+  socket.on("player_turn_switch", () =>
+    socket.broadcast.emit("player_turn_switch")
+  )
 
   socket.on("disconnect", () => {
     players = players.filter(player => player !== socket.id)

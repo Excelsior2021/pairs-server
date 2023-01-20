@@ -55,17 +55,17 @@ const shuffleDeck = deck => {
   return shuffledDeck
 }
 
-const dealTopCard = deck => deck.shift()
+const dealCard = deck => deck.shift()
 
 const dealHand = (deck, handSize) => {
   const hand = []
-  while (hand.length < handSize) hand.push(dealTopCard(deck))
+  while (hand.length < handSize) hand.push(dealCard(deck))
 
   return hand
 }
 
 const initialPairs = hand => {
-  let pairs = []
+  const pairs = []
   hand.forEach(cardX =>
     hand.forEach(cardY => {
       if (
