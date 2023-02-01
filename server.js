@@ -1,7 +1,7 @@
 import express from "express"
 import { createServer } from "http"
 import { Server } from "socket.io"
-import game from "./gameFunctions/gameFunctions.js"
+import game from "./gameFunctions.js"
 
 const app = express()
 const httpServer = createServer(app)
@@ -13,12 +13,19 @@ const io = new Server(httpServer, {
 const port = 8080
 
 let players = []
+let sessions = []
 
 io.on("connection", socket => {
   players.push(socket.id)
   console.log(players)
 
   socket.on("join_session", sessionID => {
+    if (!sessions.includes(sessionID)) {
+      socket.emit("no-sessionID")
+      return
+    } else {
+      socket.emit("sessionID-exists")
+    }
     socket.join(sessionID)
     const initialGameState = game.startGame()
     const playerTurn = "player1"
@@ -26,22 +33,15 @@ io.on("connection", socket => {
     io.sockets
       .in(sessionID)
       .emit("start", initialGameState, playerTurn, sessionID)
-    // console.log(socket.rooms)
   })
 
   socket.on("create_session", sessionID => {
-    let sessionPlayers = []
-    socket.join(sessionID.toString())
-    sessionPlayers.push(socket.id)
-
-    console.log("sessionPlayers: ", sessionPlayers)
-    // console.log(sessionID)
-
-    if (sessionPlayers.length <= 2) socket.emit("setPlayer", 1)
+    sessions.push(sessionID)
+    socket.join(sessionID)
+    socket.emit("setPlayer", 1)
   })
 
   socket.on("player_request", (player, card, sessionID) => {
-    console.log(sessionID)
     const playerRequest = { player, card }
     socket.to(sessionID).emit("player_requested", playerRequest)
   })
@@ -55,12 +55,9 @@ io.on("connection", socket => {
         gameState
       )
 
-      io.in(sessionID).emit(
-        "player_match",
-        newGameState,
-        playerOutput,
-        playerRequest.player
-      )
+      io.sockets
+        .in(sessionID)
+        .emit("player_match", newGameState, playerOutput, playerRequest.player)
     }
   )
 

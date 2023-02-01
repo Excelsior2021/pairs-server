@@ -3,13 +3,24 @@ const createDeck = () => {
   const non_num_cards = ["ace", "jack", "queen", "king"]
   const suits = ["clubs", "diamonds", "hearts", "spades"]
 
-  for (const x of [...Array(9).keys()]) {
+  for (const suit of suits) {
+    const id = `ace_of_${suit}`
+    const img = `_${id}`
+    deck.push({
+      id,
+      value: "ace",
+      suit,
+      img,
+    })
+  }
+
+  for (let value = 2; value < 11; value++) {
     for (const suit of suits) {
-      const id = `${x + 2}_of_${suit}`
+      const id = `${value}_of_${suit}`
       const img = `_${id}`
       deck.push({
         id,
-        value: x + 2,
+        value,
         suit,
         img,
       })
@@ -31,31 +42,20 @@ const createDeck = () => {
     }
   }
 
-  for (const suit of suits.reverse()) {
-    const id = `ace_of_${suit}`
-    const img = `_${id}`
-    deck.unshift({
-      id,
-      value: "ace",
-      suit,
-      img,
-    })
-  }
   return deck
 }
 
 const shuffleDeck = deck => {
-  const shuffledDeck = [...deck]
-  for (const x in shuffledDeck) {
+  for (const x in deck) {
     const y = Math.floor(Math.random() * parseInt(x))
-    const temp = shuffledDeck[x]
-    shuffledDeck[x] = shuffledDeck[y]
-    shuffledDeck[y] = temp
+    const temp = deck[x]
+    deck[x] = deck[y]
+    deck[y] = temp
   }
-  return shuffledDeck
+  return deck
 }
 
-const dealCard = deck => deck.shift()
+const dealCard = deck => deck.pop()
 
 const dealHand = (deck, handSize) => {
   const hand = []
