@@ -2,22 +2,24 @@ import express from "express"
 import { createServer } from "http"
 import { Server } from "socket.io"
 import game from "./gameFunctions.js"
+import { config } from "dotenv"
 
 const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:3000"],
+    origin: "*",
   },
 })
-const port = 8080
+config() // dotenv config
+const port = process.env.PORT || 8080
 
 let players = []
 let sessions = []
 
 io.on("connection", socket => {
   players.push(socket.id)
-  console.log(players)
+  console.log("sockets: ", players)
 
   socket.on("join_session", sessionID => {
     if (!sessions.includes(sessionID)) {
@@ -89,9 +91,13 @@ io.on("connection", socket => {
     socket.to(sessionID).emit("player_turn_switch")
   )
 
+  socket.on("player_disconnected", sessionID => {
+    socket.to(sessionID).emit("player_disconnected")
+  })
+
   socket.on("disconnect", () => {
     players = players.filter(player => player !== socket.id)
-    console.log("disconnected", players)
+    console.log("sockets: ", players)
   })
 })
 
