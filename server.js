@@ -22,26 +22,31 @@ io.on("connection", socket => {
   console.log("sockets: ", players)
 
   socket.on("join_session", sessionID => {
-    if (!sessions.includes(sessionID)) {
-      socket.emit("no-sessionID")
-      return
-    } else {
-      socket.emit("sessionID-exists")
+    for (let i = 0; i < sessions.length; i++) {
+      if (sessions[i].sessionID === sessionID) {
+        socket.emit("sessionID-exists")
+        socket.join(sessionID)
+        sessions[i].players.push(socket.id)
+        const initialGameState = game.startGame()
+        const playerTurn = "player1"
+        socket.emit("setPlayer", sessions[i].player === 1 ? 2 : 1)
+        io.sockets
+          .in(sessionID)
+          .emit("start", initialGameState, playerTurn, sessionID)
+        return
+      }
     }
-    socket.join(sessionID)
-    const initialGameState = game.startGame()
-    const playerTurn = "player1"
-    socket.emit("setPlayer", 2)
-    io.sockets
-      .in(sessionID)
-      .emit("start", initialGameState, playerTurn, sessionID)
+    socket.emit("no-sessionID")
   })
 
   socket.on("create_session", sessionID => {
-    sessions.push(sessionID)
+    const player = Math.ceil(Math.random() * 2)
+    sessions.push({ sessionID, player, players: [socket.id] })
     socket.join(sessionID)
-    socket.emit("setPlayer", 1)
+    socket.emit("setPlayer", player)
   })
+
+  socket.on("recieve_sessionID", () => socket.emit("recieved_sessionID"))
 
   socket.on("player_request", (player, card, sessionID) => {
     const playerRequest = { player, card }
@@ -91,12 +96,16 @@ io.on("connection", socket => {
     socket.to(sessionID).emit("player_turn_switch")
   )
 
-  socket.on("player_disconnected", sessionID => {
-    socket.to(sessionID).emit("player_disconnected")
-  })
-
   socket.on("disconnect", () => {
     players = players.filter(player => player !== socket.id)
+    for (let i = 0; i < sessions.length; i++) {
+      if (sessions[i].players.includes(socket.id)) {
+        socket.to(sessions[i].sessionID).emit("player_disconnected")
+        sessions.splice(i, 1)
+        break
+      }
+    }
+    console.log(sessions)
     console.log("sockets: ", players)
   })
 })
