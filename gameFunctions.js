@@ -5,7 +5,6 @@ const createDeck = () => {
 
   for (const suit of suits) {
     const id = `ace_of_${suit}`
-    const img = `_${id}`
     deck.push({
       id,
       value: "ace",
@@ -17,7 +16,6 @@ const createDeck = () => {
   for (let value = 2; value < 11; value++) {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
-      const img = `_${id}`
       deck.push({
         id,
         value,
@@ -31,7 +29,6 @@ const createDeck = () => {
     if (value !== "ace") {
       for (const suit of suits) {
         const id = `${value}_of_${suit}`
-        const img = `_${id}`
         deck.push({
           id,
           value,
