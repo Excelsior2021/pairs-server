@@ -9,7 +9,6 @@ const createDeck = () => {
       id,
       value: "ace",
       suit,
-      img,
     })
   }
 
@@ -20,7 +19,6 @@ const createDeck = () => {
         id,
         value,
         suit,
-        img,
       })
     }
   }
@@ -33,7 +31,6 @@ const createDeck = () => {
           id,
           value,
           suit,
-          img,
         })
       }
     }
