@@ -3,7 +3,7 @@ import { createServer } from "http"
 import { Server } from "socket.io"
 import game from "./gameFunctions.js"
 import { config } from "dotenv"
-import { session, card, playerRequest, gameState } from "./types/types"
+import { session, Card, playerRequest, gameState } from "./types/types"
 
 const app = express()
 const httpServer = createServer(app)
@@ -51,7 +51,7 @@ io.on("connection", socket => {
 
   socket.on(
     "player_request",
-    (player: number, card: card, sessionID: string) => {
+    (player: number, card: Card, sessionID: string) => {
       const playerRequest = { player, card }
       socket.to(sessionID).emit("player_requested", playerRequest)
     }
@@ -87,8 +87,8 @@ io.on("connection", socket => {
   socket.on(
     "player_dealt",
     (
-      dealtCard: card,
-      shuffledDeck: card[],
+      dealtCard: Card,
+      shuffledDeck: Card[],
       playerRequest: playerRequest,
       gameState: gameState,
       sessionID: string

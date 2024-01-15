@@ -1,37 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const types_1 = require("./types/types");
 const createDeck = () => {
     const deck = [];
     const non_num_cards = ["ace", "jack", "queen", "king"];
     const suits = ["clubs", "diamonds", "hearts", "spades"];
-    for (const suit of suits) {
-        const id = `ace_of_${suit}`;
-        deck.push({
-            id,
-            value: "ace",
-            suit,
-        });
+    for (const value of non_num_cards) {
+        for (const suit of suits) {
+            const id = `${value}_of_${suit}`;
+            deck.push(new types_1.Card(id, value, suit));
+        }
     }
     for (let value = 2; value < 11; value++) {
         for (const suit of suits) {
             const id = `${value}_of_${suit}`;
-            deck.push({
-                id,
-                value,
-                suit,
-            });
-        }
-    }
-    for (const value of non_num_cards) {
-        if (value !== "ace") {
-            for (const suit of suits) {
-                const id = `${value}_of_${suit}`;
-                deck.push({
-                    id,
-                    value,
-                    suit,
-                });
-            }
+            deck.push(new types_1.Card(id, value, suit));
         }
     }
     return deck;

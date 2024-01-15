@@ -8,22 +8,14 @@ const createDeck = () => {
   for (const value of non_num_cards) {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
-      deck.push({
-        id,
-        value,
-        suit,
-      })
+      deck.push(new Card(id, value, suit))
     }
   }
 
   for (let value = 2; value < 11; value++) {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
-      deck.push({
-        id,
-        value,
-        suit,
-      })
+      deck.push(new Card(id, value, suit))
     }
   }
 
