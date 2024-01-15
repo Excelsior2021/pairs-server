@@ -1,4 +1,5 @@
-import { Card, gameState, playerRequest } from "./types/types"
+import type { Card, gameState, playerRequest } from "./types/types"
+import { Card as CardObj } from "./types/types"
 
 const createDeck = () => {
   const deck: Card[] = []
@@ -8,14 +9,14 @@ const createDeck = () => {
   for (const value of non_num_cards) {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
-      deck.push(new Card(id, value, suit))
+      deck.push(new CardObj(id, value, suit))
     }
   }
 
   for (let value = 2; value < 11; value++) {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
-      deck.push(new Card(id, value, suit))
+      deck.push(new CardObj(id, value, suit))
     }
   }
 

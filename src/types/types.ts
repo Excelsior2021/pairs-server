@@ -8,7 +8,7 @@ export class Card {
   value: string | number
   suit: string
 
-  constructor(id, value, suit) {
+  constructor(id: string, value: string | number, suit: string) {
     this.id = id
     this.value = value
     this.suit = suit
@@ -17,13 +17,13 @@ export class Card {
 
 export type playerRequest = {
   player: number
-  card: card
+  card: Card
 }
 
 export type gameState = {
-  player1Hand: card[]
-  player2Hand: card[]
-  player1Pairs: card[]
-  player2Pairs: card[]
-  shuffledDeck: card[]
+  player1Hand: Card[]
+  player2Hand: Card[]
+  player1Pairs: Card[]
+  player2Pairs: Card[]
+  shuffledDeck: Card[]
 }

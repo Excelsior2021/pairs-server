@@ -3,7 +3,7 @@ import { createServer } from "http"
 import { Server } from "socket.io"
 import game from "./gameFunctions.js"
 import { config } from "dotenv"
-import { session, Card, playerRequest, gameState } from "./types/types"
+import type { session, Card, playerRequest, gameState } from "./types/types"
 
 const app = express()
 const httpServer = createServer(app)
