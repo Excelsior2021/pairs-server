@@ -3,10 +3,16 @@ export type session = {
   playersSocketIDs: string[]
 }
 
-export type card = {
+export class Card {
   id: string
   value: string | number
   suit: string
+
+  constructor(id, value, suit) {
+    this.id = id
+    this.value = value
+    this.suit = suit
+  }
 }
 
 export type playerRequest = {

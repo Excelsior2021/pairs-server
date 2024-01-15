@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleDealtCard = exports.handlePlayerMatchPairs = exports.startGame = void 0;
 const createDeck = () => {
     const deck = [];
     const non_num_cards = ["ace", "jack", "queen", "king"];
@@ -84,7 +83,6 @@ const startGame = () => {
         player2Pairs,
     };
 };
-exports.startGame = startGame;
 const handlePlayerMatchPairs = (playerRequest, playerMatch, gameState) => {
     if (playerRequest.player === 1) {
         gameState.player1Pairs.push(playerRequest.card, playerMatch.card);
@@ -98,7 +96,6 @@ const handlePlayerMatchPairs = (playerRequest, playerMatch, gameState) => {
     }
     return gameState;
 };
-exports.handlePlayerMatchPairs = handlePlayerMatchPairs;
 const handleDealtCard = (dealtCard, shuffledDeck, playerRequest, gameState) => {
     gameState.shuffledDeck = shuffledDeck;
     const playerRequestCard = playerRequest.card;
@@ -153,9 +150,13 @@ const handleDealtCard = (dealtCard, shuffledDeck, playerRequest, gameState) => {
         };
     }
 };
-exports.handleDealtCard = handleDealtCard;
 exports.default = {
-    startGame: exports.startGame,
-    handlePlayerMatchPairs: exports.handlePlayerMatchPairs,
-    handleDealtCard: exports.handleDealtCard,
+    createDeck,
+    shuffleDeck,
+    dealCard,
+    dealHand,
+    initialPairs,
+    startGame,
+    handlePlayerMatchPairs,
+    handleDealtCard,
 };

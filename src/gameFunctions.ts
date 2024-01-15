@@ -1,17 +1,19 @@
-import { card, gameState, playerRequest } from "./types/types"
+import { Card, gameState, playerRequest } from "./types/types"
 
 const createDeck = () => {
-  const deck: card[] = []
+  const deck: Card[] = []
   const non_num_cards = ["ace", "jack", "queen", "king"]
   const suits = ["clubs", "diamonds", "hearts", "spades"]
 
-  for (const suit of suits) {
-    const id = `ace_of_${suit}`
-    deck.push({
-      id,
-      value: "ace",
-      suit,
-    })
+  for (const value of non_num_cards) {
+    for (const suit of suits) {
+      const id = `${value}_of_${suit}`
+      deck.push({
+        id,
+        value,
+        suit,
+      })
+    }
   }
 
   for (let value = 2; value < 11; value++) {
@@ -25,23 +27,10 @@ const createDeck = () => {
     }
   }
 
-  for (const value of non_num_cards) {
-    if (value !== "ace") {
-      for (const suit of suits) {
-        const id = `${value}_of_${suit}`
-        deck.push({
-          id,
-          value,
-          suit,
-        })
-      }
-    }
-  }
-
   return deck
 }
 
-const shuffleDeck = (deck: card[]) => {
+const shuffleDeck = (deck: Card[]) => {
   for (const x in deck) {
     const y = Math.floor(Math.random() * parseInt(x))
     const temp = deck[x]
@@ -51,16 +40,16 @@ const shuffleDeck = (deck: card[]) => {
   return deck
 }
 
-const dealCard = (deck: card[]) => deck.pop()
+const dealCard = (deck: Card[]) => deck.pop()
 
-const dealHand = (deck: card[], handSize: number) => {
-  const hand: card[] = []
+const dealHand = (deck: Card[], handSize: number) => {
+  const hand: Card[] = []
   while (hand.length < handSize) hand.push(dealCard(deck)!)
   return hand
 }
 
-const initialPairs = (hand: card[]) => {
-  const pairs: card[] = []
+const initialPairs = (hand: Card[]) => {
+  const pairs: Card[] = []
   hand.forEach(cardX =>
     hand.forEach(cardY => {
       if (
@@ -83,7 +72,7 @@ const initialPairs = (hand: card[]) => {
   return pairs
 }
 
-export const startGame = () => {
+const startGame = () => {
   const newDeck = createDeck()
   const shuffledDeck = shuffleDeck(newDeck)
 
@@ -102,7 +91,7 @@ export const startGame = () => {
   }
 }
 
-export const handlePlayerMatchPairs = (
+const handlePlayerMatchPairs = (
   playerRequest: playerRequest,
   playerMatch: playerRequest,
   gameState: gameState
@@ -130,9 +119,9 @@ export const handlePlayerMatchPairs = (
   return gameState
 }
 
-export const handleDealtCard = (
-  dealtCard: card,
-  shuffledDeck: card[],
+const handleDealtCard = (
+  dealtCard: Card,
+  shuffledDeck: Card[],
   playerRequest: playerRequest,
   gameState: gameState
 ) => {
@@ -205,6 +194,11 @@ export const handleDealtCard = (
 }
 
 export default {
+  createDeck,
+  shuffleDeck,
+  dealCard,
+  dealHand,
+  initialPairs,
   startGame,
   handlePlayerMatchPairs,
   handleDealtCard,
