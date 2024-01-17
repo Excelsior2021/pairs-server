@@ -1,5 +1,5 @@
 import type { Card, gameState, playerRequest } from "./types/types"
-import { Card as CardObj } from "./types/types"
+import { Card as CardObj, playerOutput } from "./types/types"
 
 const createDeck = () => {
   const deck: Card[] = []
@@ -66,8 +66,7 @@ const initialPairs = (hand: Card[]) => {
 }
 
 const startGame = () => {
-  const newDeck = createDeck()
-  const shuffledDeck = shuffleDeck(newDeck)
+  const shuffledDeck = shuffleDeck(createDeck())
 
   const player1Hand = dealHand(shuffledDeck, 7)
   const player2Hand = dealHand(shuffledDeck, 7)
@@ -129,7 +128,7 @@ const handleDealtCard = (
       )
       return {
         gameState,
-        playerOutput: 1,
+        playerOutput: playerOutput.DealtCardMatch,
       }
     }
 
@@ -141,7 +140,7 @@ const handleDealtCard = (
         )
         return {
           gameState,
-          playerOutput: 2,
+          playerOutput: playerOutput.HandMatch,
         }
       }
     }
@@ -149,7 +148,7 @@ const handleDealtCard = (
     gameState.player1Hand.push(dealtCard)
     return {
       gameState,
-      playerOutput: 3,
+      playerOutput: playerOutput.NoMatch,
     }
   }
 
@@ -161,7 +160,7 @@ const handleDealtCard = (
       )
       return {
         gameState,
-        playerOutput: 1,
+        playerOutput: playerOutput.DealtCardMatch,
       }
     }
 
@@ -173,7 +172,7 @@ const handleDealtCard = (
         )
         return {
           gameState,
-          playerOutput: 2,
+          playerOutput: playerOutput.HandMatch,
         }
       }
     }
@@ -181,7 +180,7 @@ const handleDealtCard = (
     gameState.player2Hand.push(dealtCard)
     return {
       gameState,
-      playerOutput: 3,
+      playerOutput: playerOutput.NoMatch,
     }
   }
 }

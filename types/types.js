@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Card = void 0;
+exports.playerOutput = exports.Card = void 0;
 class Card {
     constructor(id, value, suit) {
         this.id = id;
@@ -9,3 +9,9 @@ class Card {
     }
 }
 exports.Card = Card;
+var playerOutput;
+(function (playerOutput) {
+    playerOutput[playerOutput["DealtCardMatch"] = 1] = "DealtCardMatch";
+    playerOutput[playerOutput["HandMatch"] = 2] = "HandMatch";
+    playerOutput[playerOutput["NoMatch"] = 3] = "NoMatch";
+})(playerOutput || (exports.playerOutput = playerOutput = {}));

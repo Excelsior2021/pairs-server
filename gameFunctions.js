@@ -52,8 +52,7 @@ const initialPairs = (hand) => {
     return pairs;
 };
 const startGame = () => {
-    const newDeck = createDeck();
-    const shuffledDeck = shuffleDeck(newDeck);
+    const shuffledDeck = shuffleDeck(createDeck());
     const player1Hand = dealHand(shuffledDeck, 7);
     const player2Hand = dealHand(shuffledDeck, 7);
     const player1Pairs = initialPairs(player1Hand);
@@ -88,7 +87,7 @@ const handleDealtCard = (dealtCard, shuffledDeck, playerRequest, gameState) => {
             gameState.player1Hand = gameState.player1Hand.filter(card => card.id !== playerRequestCard.id);
             return {
                 gameState,
-                playerOutput: 1,
+                playerOutput: types_1.playerOutput.DealtCardMatch,
             };
         }
         for (const card of gameState.player1Hand) {
@@ -97,14 +96,14 @@ const handleDealtCard = (dealtCard, shuffledDeck, playerRequest, gameState) => {
                 gameState.player1Hand = gameState.player1Hand.filter(cardInHand => cardInHand.id !== card.id);
                 return {
                     gameState,
-                    playerOutput: 2,
+                    playerOutput: types_1.playerOutput.HandMatch,
                 };
             }
         }
         gameState.player1Hand.push(dealtCard);
         return {
             gameState,
-            playerOutput: 3,
+            playerOutput: types_1.playerOutput.NoMatch,
         };
     }
     if (playerRequest.player === 2) {
@@ -113,7 +112,7 @@ const handleDealtCard = (dealtCard, shuffledDeck, playerRequest, gameState) => {
             gameState.player2Hand = gameState.player2Hand.filter(card => card.id !== playerRequestCard.id);
             return {
                 gameState,
-                playerOutput: 1,
+                playerOutput: types_1.playerOutput.DealtCardMatch,
             };
         }
         for (const card of gameState.player2Hand) {
@@ -122,14 +121,14 @@ const handleDealtCard = (dealtCard, shuffledDeck, playerRequest, gameState) => {
                 gameState.player2Hand = gameState.player2Hand.filter(cardInHand => cardInHand.id !== card.id);
                 return {
                     gameState,
-                    playerOutput: 2,
+                    playerOutput: types_1.playerOutput.HandMatch,
                 };
             }
         }
         gameState.player2Hand.push(dealtCard);
         return {
             gameState,
-            playerOutput: 3,
+            playerOutput: types_1.playerOutput.NoMatch,
         };
     }
 };

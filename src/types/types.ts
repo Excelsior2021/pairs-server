@@ -27,3 +27,9 @@ export type gameState = {
   player2Pairs: Card[]
   shuffledDeck: Card[]
 }
+
+export enum playerOutput {
+  DealtCardMatch = 1,
+  HandMatch,
+  NoMatch,
+}
