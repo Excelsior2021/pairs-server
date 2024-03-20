@@ -8,6 +8,7 @@ const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const gameFunctions_js_1 = __importDefault(require("./gameFunctions.js"));
 const dotenv_1 = require("dotenv");
+const functions_js_1 = require("./functions/functions.js");
 const app = (0, express_1.default)();
 const httpServer = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(httpServer, {
@@ -31,7 +32,6 @@ io.on("connection", socket => {
                 const initialGameState = gameFunctions_js_1.default.startGame();
                 socket.emit("setPlayer", 2);
                 const playerTurn = Math.ceil(Math.random() * 2);
-                console.log(playerTurn);
                 io.sockets
                     .in(sessionID)
                     .emit("start", initialGameState, playerTurn, sessionID);
@@ -51,14 +51,16 @@ io.on("connection", socket => {
         socket.to(sessionID).emit("player_requested", playerRequest);
     });
     socket.on("player_match", (playerRequest, playerMatch, gameState, playerOutput, sessionID) => {
-        const newGameState = gameFunctions_js_1.default.handlePlayerMatchPairs(playerRequest, playerMatch, gameState);
+        const gameStateRemapped = (0, functions_js_1.gameStateRemap)(gameState, playerMatch.clientPlayer);
+        const newGameState = gameFunctions_js_1.default.handlePlayerMatchPairs(playerRequest, playerMatch, gameStateRemapped);
         io.sockets
             .in(sessionID)
             .emit("player_match", newGameState, playerOutput, playerRequest.player);
     });
     socket.on("no_player_match", (playerRequest, sessionID) => socket.to(sessionID).emit("player_to_deal", playerRequest));
-    socket.on("player_dealt", (dealtCard, shuffledDeck, playerRequest, gameState, sessionID) => {
-        const dealt = gameFunctions_js_1.default.handleDealtCard(dealtCard, shuffledDeck, playerRequest, gameState);
+    socket.on("player_dealt", (playerRequest, gameState, sessionID) => {
+        const gameStateRemapped = (0, functions_js_1.gameStateRemap)(gameState, playerRequest.player);
+        const dealt = gameFunctions_js_1.default.handleDealCard(playerRequest, gameStateRemapped);
         const newGameState = dealt === null || dealt === void 0 ? void 0 : dealt.gameState;
         const playerOutput = dealt === null || dealt === void 0 ? void 0 : dealt.playerOutput;
         io.sockets
@@ -66,7 +68,7 @@ io.on("connection", socket => {
             .emit("player_dealt", newGameState, playerOutput, playerRequest.player);
     });
     socket.on("player_response_message", (playerOutput, sessionID) => socket.to(sessionID).emit("player_response_message", playerOutput));
-    socket.on("player_turn_switch", (sessionID) => socket.to(sessionID).emit("player_turn_switch"));
+    socket.on("player_turn_switch", (sessionID, playerTurn) => socket.to(sessionID).emit("player_turn_switch", playerTurn));
     socket.on("disconnect", () => {
         playersSocketIDs = playersSocketIDs.filter(player => player !== socket.id);
         for (let i = 0; i < sessions.length; i++) {

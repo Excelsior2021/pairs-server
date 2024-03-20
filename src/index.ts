@@ -3,7 +3,13 @@ import { createServer } from "http"
 import { Server } from "socket.io"
 import game from "./gameFunctions.js"
 import { config } from "dotenv"
-import type { session, Card, playerRequest, gameState } from "./types/types"
+import type {
+  session,
+  Card,
+  playerRequest,
+  gameStateClient,
+} from "./types/types"
+import { gameStateRemap } from "./functions/functions.js"
 
 const app = express()
 const httpServer = createServer(app)
@@ -31,7 +37,6 @@ io.on("connection", socket => {
         const initialGameState = game.startGame()
         socket.emit("setPlayer", 2)
         const playerTurn = Math.ceil(Math.random() * 2)
-        console.log(playerTurn)
         io.sockets
           .in(sessionID)
           .emit("start", initialGameState, playerTurn, sessionID)
@@ -61,15 +66,19 @@ io.on("connection", socket => {
     "player_match",
     (
       playerRequest: playerRequest,
-      playerMatch: playerRequest,
-      gameState: gameState,
+      playerMatch: any,
+      gameState: gameStateClient,
       playerOutput: number,
       sessionID: string
     ) => {
+      const gameStateRemapped = gameStateRemap(
+        gameState,
+        playerMatch.clientPlayer
+      )
       const newGameState = game.handlePlayerMatchPairs(
         playerRequest,
         playerMatch,
-        gameState
+        gameStateRemapped
       )
 
       io.sockets
@@ -87,18 +96,12 @@ io.on("connection", socket => {
   socket.on(
     "player_dealt",
     (
-      dealtCard: Card,
-      shuffledDeck: Card[],
       playerRequest: playerRequest,
-      gameState: gameState,
+      gameState: gameStateClient,
       sessionID: string
     ) => {
-      const dealt = game.handleDealtCard(
-        dealtCard,
-        shuffledDeck,
-        playerRequest,
-        gameState
-      )
+      const gameStateRemapped = gameStateRemap(gameState, playerRequest.player)
+      const dealt = game.handleDealCard(playerRequest, gameStateRemapped)
 
       const newGameState = dealt?.gameState
       const playerOutput = dealt?.playerOutput
@@ -115,8 +118,8 @@ io.on("connection", socket => {
       socket.to(sessionID).emit("player_response_message", playerOutput)
   )
 
-  socket.on("player_turn_switch", (sessionID: string) =>
-    socket.to(sessionID).emit("player_turn_switch")
+  socket.on("player_turn_switch", (sessionID: string, playerTurn: number) =>
+    socket.to(sessionID).emit("player_turn_switch", playerTurn)
   )
 
   socket.on("disconnect", () => {

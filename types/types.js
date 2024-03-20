@@ -2,10 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.playerOutput = exports.Card = void 0;
 class Card {
-    constructor(id, value, suit) {
+    constructor(id, value, suit, img) {
         this.id = id;
         this.value = value;
         this.suit = suit;
+        this.img = img;
     }
 }
 exports.Card = Card;

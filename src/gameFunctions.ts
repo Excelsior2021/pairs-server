@@ -1,22 +1,28 @@
-import type { Card, gameState, playerRequest } from "./types/types"
+import Player from "./gameObjects/Player"
+import type { Card, gameStateServer, playerRequest } from "./types/types"
 import { Card as CardObj, playerOutput } from "./types/types"
 
 const createDeck = () => {
-  const deck: Card[] = []
+  const deck: Card[] = new Array(52)
   const non_num_cards = ["ace", "jack", "queen", "king"]
   const suits = ["clubs", "diamonds", "hearts", "spades"]
+  let deckIndex = 0
 
   for (const value of non_num_cards) {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
-      deck.push(new CardObj(id, value, suit))
+      const img = `./cards/${id}.png`
+      deck[deckIndex] = new CardObj(id, value, suit, img)
+      deckIndex++
     }
   }
 
   for (let value = 2; value < 11; value++) {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
-      deck.push(new CardObj(id, value, suit))
+      const img = `./cards/${id}.png`
+      deck[deckIndex] = new CardObj(id, value, suit, img)
+      deckIndex++
     }
   }
 
@@ -36,8 +42,8 @@ const shuffleDeck = (deck: Card[]) => {
 const dealCard = (deck: Card[]) => deck.pop()
 
 const dealHand = (deck: Card[], handSize: number) => {
-  const hand: Card[] = []
-  while (hand.length < handSize) hand.push(dealCard(deck)!)
+  const hand: Card[] = new Array(handSize)
+  for (let i = 0; i < handSize; i++) hand[i] = dealCard(deck)!
   return hand
 }
 
@@ -74,36 +80,37 @@ const startGame = () => {
   const player1Pairs = initialPairs(player1Hand)
   const player2Pairs = initialPairs(player2Hand)
 
+  const player1 = new Player(player1Hand, player1Pairs)
+  const player2 = new Player(player2Hand, player2Pairs)
+
   return {
     shuffledDeck,
-    player1Hand,
-    player2Hand,
-    player1Pairs,
-    player2Pairs,
+    player1,
+    player2,
   }
 }
 
 const handlePlayerMatchPairs = (
   playerRequest: playerRequest,
   playerMatch: playerRequest,
-  gameState: gameState
+  gameState: gameStateServer
 ) => {
   if (playerRequest.player === 1) {
-    gameState.player1Pairs.push(playerRequest.card, playerMatch.card)
-    gameState.player1Hand = gameState.player1Hand.filter(
+    gameState.player1.pairs.push(playerRequest.card, playerMatch.card)
+    gameState.player1.hand = gameState.player1.hand.filter(
       card => card.id !== playerRequest.card.id
     )
-    gameState.player2Hand = gameState.player2Hand.filter(
+    gameState.player2.hand = gameState.player2.hand.filter(
       card => card.id !== playerMatch.card.id
     )
   }
 
   if (playerRequest.player === 2) {
-    gameState.player2Pairs.push(playerRequest.card, playerMatch.card)
-    gameState.player2Hand = gameState.player2Hand.filter(
+    gameState.player2.pairs.push(playerRequest.card, playerMatch.card)
+    gameState.player2.hand = gameState.player2.hand.filter(
       card => card.id !== playerRequest.card.id
     )
-    gameState.player1Hand = gameState.player1Hand.filter(
+    gameState.player1.hand = gameState.player1.hand.filter(
       card => card.id !== playerMatch.card.id
     )
   }
@@ -111,19 +118,17 @@ const handlePlayerMatchPairs = (
   return gameState
 }
 
-const handleDealtCard = (
-  dealtCard: Card,
-  shuffledDeck: Card[],
+const handleDealCard = (
   playerRequest: playerRequest,
-  gameState: gameState
+  gameState: gameStateServer
 ) => {
-  gameState.shuffledDeck = shuffledDeck
   const playerRequestCard = playerRequest.card
+  const dealtCard = dealCard(gameState.shuffledDeck)
 
   if (playerRequest.player === 1) {
     if (playerRequestCard.value === dealtCard.value) {
-      gameState.player1Pairs.push(dealtCard, playerRequestCard)
-      gameState.player1Hand = gameState.player1Hand.filter(
+      gameState.player1.pairs.push(dealtCard, playerRequestCard)
+      gameState.player1.hand = gameState.player1.hand.filter(
         card => card.id !== playerRequestCard.id
       )
       return {
@@ -132,10 +137,10 @@ const handleDealtCard = (
       }
     }
 
-    for (const card of gameState.player1Hand) {
+    for (const card of gameState.player1.hand) {
       if (dealtCard.value === card.value) {
-        gameState.player1Pairs.push(dealtCard, card)
-        gameState.player1Hand = gameState.player1Hand.filter(
+        gameState.player1.pairs.push(dealtCard, card)
+        gameState.player1.hand = gameState.player1.hand.filter(
           cardInHand => cardInHand.id !== card.id
         )
         return {
@@ -145,7 +150,8 @@ const handleDealtCard = (
       }
     }
 
-    gameState.player1Hand.push(dealtCard)
+    gameState.player1.hand.push(dealtCard)
+
     return {
       gameState,
       playerOutput: playerOutput.NoMatch,
@@ -154,8 +160,8 @@ const handleDealtCard = (
 
   if (playerRequest.player === 2) {
     if (playerRequestCard.value === dealtCard.value) {
-      gameState.player2Pairs.push(dealtCard, playerRequestCard)
-      gameState.player2Hand = gameState.player2Hand.filter(
+      gameState.player2.pairs.push(dealtCard, playerRequestCard)
+      gameState.player2.hand = gameState.player2.hand.filter(
         card => card.id !== playerRequestCard.id
       )
       return {
@@ -164,10 +170,10 @@ const handleDealtCard = (
       }
     }
 
-    for (const card of gameState.player2Hand) {
+    for (const card of gameState.player2.hand) {
       if (dealtCard.value === card.value) {
-        gameState.player2Pairs.push(dealtCard, card)
-        gameState.player2Hand = gameState.player2Hand.filter(
+        gameState.player2.pairs.push(dealtCard, card)
+        gameState.player2.hand = gameState.player2.hand.filter(
           cardInHand => cardInHand.id !== card.id
         )
         return {
@@ -177,7 +183,7 @@ const handleDealtCard = (
       }
     }
 
-    gameState.player2Hand.push(dealtCard)
+    gameState.player2.hand.push(dealtCard)
     return {
       gameState,
       playerOutput: playerOutput.NoMatch,
@@ -193,5 +199,5 @@ export default {
   initialPairs,
   startGame,
   handlePlayerMatchPairs,
-  handleDealtCard,
+  handleDealCard,
 }
