@@ -4,7 +4,7 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "start": "tsc && nodemon",
+    "start": "tsc && node ./dist/index.js",
     "test": "vitest"
   },
   "keywords": [],
