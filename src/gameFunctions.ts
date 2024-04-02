@@ -1,14 +1,20 @@
+import { nonNumValue, suit } from "./gameObjects/Card"
 import Player from "./gameObjects/Player"
 import type { Card, gameStateServer, playerRequest } from "./types/types"
 import { Card as CardObj, playerOutput } from "./types/types"
 
 const createDeck = () => {
   const deck: Card[] = new Array(52)
-  const non_num_cards = ["ace", "jack", "queen", "king"]
-  const suits = ["clubs", "diamonds", "hearts", "spades"]
+  const non_num_cards = [
+    nonNumValue.ace,
+    nonNumValue.jack,
+    nonNumValue.queen,
+    nonNumValue.king,
+  ]
+  const suits = [suit.clubs, suit.diamonds, suit.hearts, suit.spades]
   let deckIndex = 0
 
-  for (const value of non_num_cards) {
+  const createSuits = (value: number | string) => {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
       const img = `./cards/${id}.png`
@@ -17,14 +23,9 @@ const createDeck = () => {
     }
   }
 
-  for (let value = 2; value < 11; value++) {
-    for (const suit of suits) {
-      const id = `${value}_of_${suit}`
-      const img = `./cards/${id}.png`
-      deck[deckIndex] = new CardObj(id, value, suit, img)
-      deckIndex++
-    }
-  }
+  for (const value of non_num_cards) createSuits(value)
+
+  for (let value = 2; value < 11; value++) createSuits(value)
 
   return deck
 }

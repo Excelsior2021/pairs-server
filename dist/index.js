@@ -3,20 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const gameFunctions_js_1 = __importDefault(require("./gameFunctions.js"));
 const dotenv_1 = require("dotenv");
 const functions_js_1 = require("./functions/functions.js");
-const app = (0, express_1.default)();
-const httpServer = (0, http_1.createServer)(app);
-const io = new socket_io_1.Server(httpServer, {
+const io = new socket_io_1.Server({
     cors: {
         origin: "*",
     },
 });
-(0, dotenv_1.config)(); // dotenv config
+(0, dotenv_1.config)();
 const port = process.env.PORT || 8080;
 let playersSocketIDs = [];
 let sessions = [];
@@ -82,4 +78,5 @@ io.on("connection", socket => {
         console.log("sockets: ", playersSocketIDs);
     });
 });
-httpServer.listen(port, () => console.log(`listening on port: ${port}`));
+io.listen(Number(port));
+console.log(`listening on port: ${port}`);

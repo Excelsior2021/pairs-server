@@ -1,5 +1,3 @@
-import express from "express"
-import { createServer } from "http"
 import { Server } from "socket.io"
 import game from "./gameFunctions.js"
 import { config } from "dotenv"
@@ -11,14 +9,12 @@ import type {
 } from "./types/types"
 import { gameStateRemap } from "./functions/functions.js"
 
-const app = express()
-const httpServer = createServer(app)
-const io = new Server(httpServer, {
+const io = new Server({
   cors: {
     origin: "*",
   },
 })
-config() // dotenv config
+config()
 const port = process.env.PORT || 8080
 
 let playersSocketIDs: string[] = []
@@ -136,4 +132,5 @@ io.on("connection", socket => {
   })
 })
 
-httpServer.listen(port, () => console.log(`listening on port: ${port}`))
+io.listen(Number(port))
+console.log(`listening on port: ${port}`)

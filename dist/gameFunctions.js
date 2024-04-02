@@ -3,29 +3,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const Card_1 = require("./gameObjects/Card");
 const Player_1 = __importDefault(require("./gameObjects/Player"));
 const types_1 = require("./types/types");
 const createDeck = () => {
     const deck = new Array(52);
-    const non_num_cards = ["ace", "jack", "queen", "king"];
-    const suits = ["clubs", "diamonds", "hearts", "spades"];
+    const non_num_cards = [
+        Card_1.nonNumValue.ace,
+        Card_1.nonNumValue.jack,
+        Card_1.nonNumValue.queen,
+        Card_1.nonNumValue.king,
+    ];
+    const suits = [Card_1.suit.clubs, Card_1.suit.diamonds, Card_1.suit.hearts, Card_1.suit.spades];
     let deckIndex = 0;
-    for (const value of non_num_cards) {
+    const createSuits = (value) => {
         for (const suit of suits) {
             const id = `${value}_of_${suit}`;
             const img = `./cards/${id}.png`;
             deck[deckIndex] = new types_1.Card(id, value, suit, img);
             deckIndex++;
         }
-    }
-    for (let value = 2; value < 11; value++) {
-        for (const suit of suits) {
-            const id = `${value}_of_${suit}`;
-            const img = `./cards/${id}.png`;
-            deck[deckIndex] = new types_1.Card(id, value, suit, img);
-            deckIndex++;
-        }
-    }
+    };
+    for (const value of non_num_cards)
+        createSuits(value);
+    for (let value = 2; value < 11; value++)
+        createSuits(value);
     return deck;
 };
 const shuffleDeck = (deck) => {
