@@ -7,7 +7,7 @@ import type {
   playerRequest,
   gameStateClient,
 } from "./types/types"
-import { gameStateRemap } from "./functions/functions.js"
+import { gameStateRemap } from "./utils/utils.js"
 
 const io = new Server({
   cors: {

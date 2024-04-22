@@ -4,7 +4,8 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "start": "tsc && nodemon",
+    "start": "tsc && node ./dist/index.js",
+    "build": "tsc",
     "test": "vitest"
   },
   "keywords": [],
@@ -16,7 +17,7 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
-    "typescript": "^5.2.2",
+    "typescript": "^5.4.4",
     "vitest": "^0.34.6"
   }
 }

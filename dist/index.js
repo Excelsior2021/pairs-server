@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const socket_io_1 = require("socket.io");
 const gameFunctions_js_1 = __importDefault(require("./gameFunctions.js"));
 const dotenv_1 = require("dotenv");
-const functions_js_1 = require("./functions/functions.js");
+const utils_js_1 = require("./utils/utils.js");
 const io = new socket_io_1.Server({
     cors: {
         origin: "*",
@@ -47,7 +47,7 @@ io.on("connection", socket => {
         socket.to(sessionID).emit("player_requested", playerRequest);
     });
     socket.on("player_match", (playerRequest, playerMatch, gameState, playerOutput, sessionID) => {
-        const gameStateRemapped = (0, functions_js_1.gameStateRemap)(gameState, playerMatch.clientPlayer);
+        const gameStateRemapped = (0, utils_js_1.gameStateRemap)(gameState, playerMatch.clientPlayer);
         const newGameState = gameFunctions_js_1.default.handlePlayerMatchPairs(playerRequest, playerMatch, gameStateRemapped);
         io.sockets
             .in(sessionID)
@@ -55,7 +55,7 @@ io.on("connection", socket => {
     });
     socket.on("no_player_match", (playerRequest, sessionID) => socket.to(sessionID).emit("player_to_deal", playerRequest));
     socket.on("player_dealt", (playerRequest, gameState, sessionID) => {
-        const gameStateRemapped = (0, functions_js_1.gameStateRemap)(gameState, playerRequest.player);
+        const gameStateRemapped = (0, utils_js_1.gameStateRemap)(gameState, playerRequest.player);
         const dealt = gameFunctions_js_1.default.handleDealCard(playerRequest, gameStateRemapped);
         const newGameState = dealt === null || dealt === void 0 ? void 0 : dealt.gameState;
         const playerOutput = dealt === null || dealt === void 0 ? void 0 : dealt.playerOutput;
