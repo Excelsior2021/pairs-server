@@ -1,9 +1,17 @@
 import { gameStateClient } from "../types/types"
 
-const remap = (gameState: gameStateClient, remappedGameState, key: string) => {
-  if (key === "player") remappedGameState.player1 = gameState[key]
-  else if (key === "opponent") remappedGameState.player2 = gameState[key]
-  else remappedGameState[key] = gameState[key]
+export const remap = (
+  gameState: gameStateClient,
+  remappedGameState,
+  player: string,
+  opponent: string
+) => {
+  for (const key in gameState) {
+    if (key === "player") remappedGameState[player] = gameState[key]
+    else if (key === "opponent") remappedGameState[opponent] = gameState[key]
+    else remappedGameState[key] = gameState[key]
+  }
+  return remappedGameState
 }
 
 export const gameStateRemap = (
@@ -11,9 +19,8 @@ export const gameStateRemap = (
   clientPlayer: number
 ) => {
   const remappedGameState: any = {}
-  for (const key in gameState) {
-    if (clientPlayer === 1) remap(gameState, remappedGameState, key)
-    if (clientPlayer === 2) remap(gameState, remappedGameState, key)
-  }
-  return remappedGameState
+  if (clientPlayer === 1)
+    return remap(gameState, remappedGameState, "player1", "player2")
+  if (clientPlayer === 2)
+    return remap(gameState, remappedGameState, "player2", "player1")
 }

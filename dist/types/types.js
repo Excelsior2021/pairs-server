@@ -15,4 +15,4 @@ var playerOutput;
     playerOutput[playerOutput["DealtCardMatch"] = 1] = "DealtCardMatch";
     playerOutput[playerOutput["HandMatch"] = 2] = "HandMatch";
     playerOutput[playerOutput["NoMatch"] = 3] = "NoMatch";
-})(playerOutput = exports.playerOutput || (exports.playerOutput = {}));
+})(playerOutput || (exports.playerOutput = playerOutput = {}));

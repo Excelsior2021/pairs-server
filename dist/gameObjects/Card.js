@@ -7,14 +7,14 @@ var suit;
     suit["diamonds"] = "diamonds";
     suit["hearts"] = "hearts";
     suit["spades"] = "spades";
-})(suit = exports.suit || (exports.suit = {}));
+})(suit || (exports.suit = suit = {}));
 var nonNumValue;
 (function (nonNumValue) {
     nonNumValue["ace"] = "ace";
     nonNumValue["jack"] = "jack";
     nonNumValue["queen"] = "queen";
     nonNumValue["king"] = "king";
-})(nonNumValue = exports.nonNumValue || (exports.nonNumValue = {}));
+})(nonNumValue || (exports.nonNumValue = nonNumValue = {}));
 class Card {
     constructor(id, value, suit) {
         this.id = id;
