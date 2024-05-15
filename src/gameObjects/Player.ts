@@ -1,4 +1,4 @@
-import Card from "./Card"
+import type Card from "./Card"
 
 export default class Player {
   hand: Card[]

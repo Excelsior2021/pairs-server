@@ -1,13 +1,10 @@
 import { Server } from "socket.io"
 import game from "./gameFunctions.js"
+import { gameStateRemap } from "./utils"
 import { config } from "dotenv"
-import type {
-  session,
-  Card,
-  playerRequest,
-  gameStateClient,
-} from "./types/types"
-import { gameStateRemap } from "./utils/utils.js"
+
+import type { session, playerRequest, gameStateClient } from "../types"
+import type Card from "./gameObjects/Card.js"
 
 const io = new Server({
   cors: {

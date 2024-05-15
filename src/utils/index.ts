@@ -1,4 +1,4 @@
-import { gameStateClient } from "../types/types"
+import type { gameStateClient } from "../../types"
 
 export const remap = (
   gameState: gameStateClient,

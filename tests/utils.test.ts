@@ -1,6 +1,6 @@
 import { expect, test } from "vitest"
-import { gameStateRemap, remap } from "../src/utils/utils"
-import { gameStateClient, gameStateServer } from "../src/types/types"
+import { remap } from "../src/utils"
+import type { gameStateClient, gameStateServer } from "../types"
 
 const gameState: gameStateClient = {
   player: {
@@ -9,11 +9,13 @@ const gameState: gameStateClient = {
         id: "4_of_clubs",
         value: 4,
         suit: "clubs",
+        img: "",
       },
       {
         id: "6_of_clubs",
         value: 6,
         suit: "clubs",
+        img: "",
       },
     ],
     pairs: [
@@ -21,11 +23,13 @@ const gameState: gameStateClient = {
         id: "2_of_clubs",
         value: 2,
         suit: "clubs",
+        img: "",
       },
       {
         id: "2_of_spades",
         value: 2,
         suit: "spades",
+        img: "",
       },
     ],
   },
@@ -35,11 +39,13 @@ const gameState: gameStateClient = {
         id: "8_of_clubs",
         value: 8,
         suit: "clubs",
+        img: "",
       },
       {
         id: "10_of_clubs",
         value: 10,
         suit: "clubs",
+        img: "",
       },
     ],
     pairs: [
@@ -47,11 +53,13 @@ const gameState: gameStateClient = {
         id: "3_of_clubs",
         value: 3,
         suit: "clubs",
+        img: "",
       },
       {
         id: "3_of_spades",
         value: 3,
         suit: "spades",
+        img: "",
       },
     ],
   },
@@ -65,11 +73,13 @@ const gameStateRemapped: gameStateServer = {
         id: "4_of_clubs",
         value: 4,
         suit: "clubs",
+        img: "",
       },
       {
         id: "6_of_clubs",
         value: 6,
         suit: "clubs",
+        img: "",
       },
     ],
     pairs: [
@@ -77,11 +87,13 @@ const gameStateRemapped: gameStateServer = {
         id: "2_of_clubs",
         value: 2,
         suit: "clubs",
+        img: "",
       },
       {
         id: "2_of_spades",
         value: 2,
         suit: "spades",
+        img: "",
       },
     ],
   },
@@ -91,11 +103,13 @@ const gameStateRemapped: gameStateServer = {
         id: "8_of_clubs",
         value: 8,
         suit: "clubs",
+        img: "",
       },
       {
         id: "10_of_clubs",
         value: 10,
         suit: "clubs",
+        img: "",
       },
     ],
     pairs: [
@@ -103,11 +117,13 @@ const gameStateRemapped: gameStateServer = {
         id: "3_of_clubs",
         value: 3,
         suit: "clubs",
+        img: "",
       },
       {
         id: "3_of_spades",
         value: 3,
         suit: "spades",
+        img: "",
       },
     ],
   },

@@ -1,11 +1,34 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Card_1 = require("./gameObjects/Card");
+const Card_1 = __importStar(require("./gameObjects/Card"));
 const Player_1 = __importDefault(require("./gameObjects/Player"));
-const types_1 = require("./types/types");
+const enums_1 = require("./enums");
 const createDeck = () => {
     const deck = new Array(52);
     const non_num_cards = [
@@ -20,7 +43,7 @@ const createDeck = () => {
         for (const suit of suits) {
             const id = `${value}_of_${suit}`;
             const img = `./cards/${id}.png`;
-            deck[deckIndex] = new types_1.Card(id, value, suit, img);
+            deck[deckIndex] = new Card_1.default(id, value, suit, img);
             deckIndex++;
         }
     };
@@ -98,7 +121,7 @@ const handleDealCard = (playerRequest, gameState) => {
             gameState.player1.hand = gameState.player1.hand.filter(card => card.id !== playerRequestCard.id);
             return {
                 gameState,
-                playerOutput: types_1.playerOutput.DealtCardMatch,
+                playerOutput: enums_1.playerOutput.DealtCardMatch,
             };
         }
         for (const card of gameState.player1.hand) {
@@ -107,14 +130,14 @@ const handleDealCard = (playerRequest, gameState) => {
                 gameState.player1.hand = gameState.player1.hand.filter(cardInHand => cardInHand.id !== card.id);
                 return {
                     gameState,
-                    playerOutput: types_1.playerOutput.HandMatch,
+                    playerOutput: enums_1.playerOutput.HandMatch,
                 };
             }
         }
         gameState.player1.hand.push(dealtCard);
         return {
             gameState,
-            playerOutput: types_1.playerOutput.NoMatch,
+            playerOutput: enums_1.playerOutput.NoMatch,
         };
     }
     if (playerRequest.player === 2) {
@@ -123,7 +146,7 @@ const handleDealCard = (playerRequest, gameState) => {
             gameState.player2.hand = gameState.player2.hand.filter(card => card.id !== playerRequestCard.id);
             return {
                 gameState,
-                playerOutput: types_1.playerOutput.DealtCardMatch,
+                playerOutput: enums_1.playerOutput.DealtCardMatch,
             };
         }
         for (const card of gameState.player2.hand) {
@@ -132,14 +155,14 @@ const handleDealCard = (playerRequest, gameState) => {
                 gameState.player2.hand = gameState.player2.hand.filter(cardInHand => cardInHand.id !== card.id);
                 return {
                     gameState,
-                    playerOutput: types_1.playerOutput.HandMatch,
+                    playerOutput: enums_1.playerOutput.HandMatch,
                 };
             }
         }
         gameState.player2.hand.push(dealtCard);
         return {
             gameState,
-            playerOutput: types_1.playerOutput.NoMatch,
+            playerOutput: enums_1.playerOutput.NoMatch,
         };
     }
 };

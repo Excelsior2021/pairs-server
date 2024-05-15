@@ -1,7 +1,8 @@
-import { nonNumValue, suit } from "./gameObjects/Card"
+import Card, { nonNumValue, suit } from "./gameObjects/Card"
 import Player from "./gameObjects/Player"
-import type { Card, gameStateServer, playerRequest } from "./types/types"
-import { Card as CardObj, playerOutput } from "./types/types"
+import { playerOutput } from "./enums"
+
+import type { gameStateServer, playerRequest } from "../types"
 
 const createDeck = () => {
   const deck: Card[] = new Array(52)
@@ -14,11 +15,11 @@ const createDeck = () => {
   const suits = [suit.clubs, suit.diamonds, suit.hearts, suit.spades]
   let deckIndex = 0
 
-  const createSuits = (value: number | string) => {
+  const createSuits = (value: number | nonNumValue) => {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
       const img = `./cards/${id}.png`
-      deck[deckIndex] = new CardObj(id, value, suit, img)
+      deck[deckIndex] = new Card(id, value, suit, img)
       deckIndex++
     }
   }

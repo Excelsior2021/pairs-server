@@ -16,10 +16,11 @@ var nonNumValue;
     nonNumValue["king"] = "king";
 })(nonNumValue || (exports.nonNumValue = nonNumValue = {}));
 class Card {
-    constructor(id, value, suit) {
+    constructor(id, value, suit, img) {
         this.id = id;
         this.value = value;
         this.suit = suit;
+        this.img = img;
     }
 }
 exports.default = Card;
