@@ -2,9 +2,11 @@ import { Server } from "socket.io"
 import game from "./gameFunctions.js"
 import { gameStateRemap } from "./utils"
 import { config } from "dotenv"
+import Card, { nonNumValue, suit } from "./gameObjects/Card.js"
+import Player from "./gameObjects/Player.js"
+import { playerOutput as playerOutputEnum } from "./enums/index.js"
 
 import type { session, playerRequest, gameStateClient } from "../types"
-import type Card from "./gameObjects/Card.js"
 
 const io = new Server({
   cors: {
@@ -27,7 +29,16 @@ io.on("connection", socket => {
         socket.emit("sessionID-exists")
         socket.join(sessionID)
         sessions[i].playersSocketIDs.push(socket.id)
-        const initialGameState = game.startGame()
+        const initialGameState = game.startGame(
+          game.createDeck,
+          game.shuffleDeck,
+          game.dealHand,
+          game.initialPairs,
+          Card,
+          Player,
+          nonNumValue,
+          suit
+        )
         socket.emit("setPlayer", 2)
         const playerTurn = Math.ceil(Math.random() * 2)
         io.sockets
@@ -94,7 +105,12 @@ io.on("connection", socket => {
       sessionID: string
     ) => {
       const gameStateRemapped = gameStateRemap(gameState, playerRequest.player)
-      const dealt = game.handleDealCard(playerRequest, gameStateRemapped)
+      const dealt = game.handleDealCard(
+        playerRequest,
+        gameStateRemapped,
+        game.dealCard,
+        playerOutputEnum
+      )
 
       const newGameState = dealt?.gameState
       const playerOutput = dealt?.playerOutput

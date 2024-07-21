@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,6 +30,9 @@ const socket_io_1 = require("socket.io");
 const gameFunctions_js_1 = __importDefault(require("./gameFunctions.js"));
 const utils_1 = require("./utils");
 const dotenv_1 = require("dotenv");
+const Card_js_1 = __importStar(require("./gameObjects/Card.js"));
+const Player_js_1 = __importDefault(require("./gameObjects/Player.js"));
+const index_js_1 = require("./enums/index.js");
 const io = new socket_io_1.Server({
     cors: {
         origin: "*",
@@ -25,7 +51,7 @@ io.on("connection", socket => {
                 socket.emit("sessionID-exists");
                 socket.join(sessionID);
                 sessions[i].playersSocketIDs.push(socket.id);
-                const initialGameState = gameFunctions_js_1.default.startGame();
+                const initialGameState = gameFunctions_js_1.default.startGame(gameFunctions_js_1.default.createDeck, gameFunctions_js_1.default.shuffleDeck, gameFunctions_js_1.default.dealHand, gameFunctions_js_1.default.initialPairs, Card_js_1.default, Player_js_1.default, Card_js_1.nonNumValue, Card_js_1.suit);
                 socket.emit("setPlayer", 2);
                 const playerTurn = Math.ceil(Math.random() * 2);
                 io.sockets
@@ -56,7 +82,7 @@ io.on("connection", socket => {
     socket.on("no_player_match", (playerRequest, sessionID) => socket.to(sessionID).emit("player_to_deal", playerRequest));
     socket.on("player_dealt", (playerRequest, gameState, sessionID) => {
         const gameStateRemapped = (0, utils_1.gameStateRemap)(gameState, playerRequest.player);
-        const dealt = gameFunctions_js_1.default.handleDealCard(playerRequest, gameStateRemapped);
+        const dealt = gameFunctions_js_1.default.handleDealCard(playerRequest, gameStateRemapped, gameFunctions_js_1.default.dealCard, index_js_1.playerOutput);
         const newGameState = dealt === null || dealt === void 0 ? void 0 : dealt.gameState;
         const playerOutput = dealt === null || dealt === void 0 ? void 0 : dealt.playerOutput;
         io.sockets

@@ -1,11 +1,18 @@
-import Card, { nonNumValue, suit } from "./gameObjects/Card"
-import Player from "./gameObjects/Player"
-import { playerOutput } from "./enums"
-
+import type { playerOutput as playerOutputType } from "./enums"
 import type { gameStateServer, playerRequest } from "../types"
+import type CardType from "./gameObjects/Card"
+import type {
+  nonNumValue as nonNumValueType,
+  suit as suitType,
+} from "./gameObjects/Card"
+import type PlayerType from "./gameObjects/Player"
 
-const createDeck = () => {
-  const deck: Card[] = new Array(52)
+const createDeck = (
+  Card: typeof CardType,
+  nonNumValue: typeof nonNumValueType,
+  suit: typeof suitType
+) => {
+  const deck: CardType[] = new Array(52)
   const non_num_cards = [
     nonNumValue.ace,
     nonNumValue.jack,
@@ -15,10 +22,10 @@ const createDeck = () => {
   const suits = [suit.clubs, suit.diamonds, suit.hearts, suit.spades]
   let deckIndex = 0
 
-  const createSuits = (value: number | nonNumValue) => {
+  const createSuits = (value: number | nonNumValueType) => {
     for (const suit of suits) {
       const id = `${value}_of_${suit}`
-      const img = `./cards/${id}.png`
+      const img = `./cards/${id}.webp`
       deck[deckIndex] = new Card(id, value, suit, img)
       deckIndex++
     }
@@ -31,7 +38,7 @@ const createDeck = () => {
   return deck
 }
 
-const shuffleDeck = (deck: Card[]) => {
+const shuffleDeck = (deck: CardType[]) => {
   for (const x in deck) {
     const y = Math.floor(Math.random() * parseInt(x))
     const temp = deck[x]
@@ -41,18 +48,18 @@ const shuffleDeck = (deck: Card[]) => {
   return deck
 }
 
-const dealCard = (deck: Card[]) => deck.pop()
+const dealCard = (deck: CardType[]) => deck.pop()
 
-const dealHand = (deck: Card[], handSize: number) => {
-  const hand: Card[] = new Array(handSize)
+const dealHand = (deck: CardType[], handSize: number) => {
+  const hand: CardType[] = new Array(handSize)
   for (let i = 0; i < handSize; i++) hand[i] = dealCard(deck)!
   return hand
 }
 
-const initialPairs = (hand: Card[]) => {
-  const pairs: Card[] = []
+const initialPairs = (hand: CardType[]) => {
+  const pairs: CardType[] = []
   hand.forEach(cardX =>
-    hand.forEach(cardY => {
+    hand.some(cardY => {
       if (
         cardX.value === cardY.value &&
         cardX.suit !== cardY.suit &&
@@ -64,17 +71,24 @@ const initialPairs = (hand: Card[]) => {
   )
 
   pairs.forEach(cardP =>
-    hand.forEach(cardH => {
-      if (cardP === cardH) {
-        hand.splice(hand.indexOf(cardH), 1)
-      }
+    hand.some(cardH => {
+      if (cardP === cardH) hand.splice(hand.indexOf(cardH), 1)
     })
   )
   return pairs
 }
 
-const startGame = () => {
-  const shuffledDeck = shuffleDeck(createDeck())
+const startGame = (
+  createDeck,
+  shuffleDeck,
+  dealHand,
+  initialPairs,
+  Card: typeof CardType,
+  Player: typeof PlayerType,
+  nonNumValue: typeof nonNumValueType,
+  suit: typeof suitType
+) => {
+  const shuffledDeck = shuffleDeck(createDeck(Card, nonNumValue, suit))
 
   const player1Hand = dealHand(shuffledDeck, 7)
   const player2Hand = dealHand(shuffledDeck, 7)
@@ -97,99 +111,74 @@ const handlePlayerMatchPairs = (
   playerMatch: playerRequest,
   gameState: gameStateServer
 ) => {
+  let player: string, opp: string
+
   if (playerRequest.player === 1) {
-    gameState.player1.pairs.push(playerRequest.card, playerMatch.card)
-    gameState.player1.hand = gameState.player1.hand.filter(
-      card => card.id !== playerRequest.card.id
-    )
-    gameState.player2.hand = gameState.player2.hand.filter(
-      card => card.id !== playerMatch.card.id
-    )
+    player = "player1"
+    opp = "player2"
   }
 
   if (playerRequest.player === 2) {
-    gameState.player2.pairs.push(playerRequest.card, playerMatch.card)
-    gameState.player2.hand = gameState.player2.hand.filter(
-      card => card.id !== playerRequest.card.id
-    )
-    gameState.player1.hand = gameState.player1.hand.filter(
-      card => card.id !== playerMatch.card.id
-    )
+    player = "player2"
+    opp = "player1"
   }
+
+  gameState[player].pairs.push(playerRequest.card, playerMatch.card)
+
+  gameState[player].hand = gameState[player].hand.filter(
+    (card: CardType) => card.id !== playerRequest.card.id
+  )
+
+  gameState[opp].hand = gameState[opp].hand.filter(
+    (card: CardType) => card.id !== playerMatch.card.id
+  )
 
   return gameState
 }
 
 const handleDealCard = (
   playerRequest: playerRequest,
-  gameState: gameStateServer
+  gameState: gameStateServer,
+  dealCard,
+  playerOutput: typeof playerOutputType
 ) => {
   const playerRequestCard = playerRequest.card
   const dealtCard = dealCard(gameState.shuffledDeck)
 
-  if (playerRequest.player === 1) {
-    if (playerRequestCard.value === dealtCard.value) {
-      gameState.player1.pairs.push(dealtCard, playerRequestCard)
-      gameState.player1.hand = gameState.player1.hand.filter(
-        card => card.id !== playerRequestCard.id
-      )
-      return {
-        gameState,
-        playerOutput: playerOutput.DealtCardMatch,
-      }
-    }
+  let player: string
 
-    for (const card of gameState.player1.hand) {
-      if (dealtCard.value === card.value) {
-        gameState.player1.pairs.push(dealtCard, card)
-        gameState.player1.hand = gameState.player1.hand.filter(
-          cardInHand => cardInHand.id !== card.id
-        )
-        return {
-          gameState,
-          playerOutput: playerOutput.HandMatch,
-        }
-      }
-    }
+  if (playerRequest.player === 1) player = "player1"
+  if (playerRequest.player === 2) player = "player2"
 
-    gameState.player1.hand.push(dealtCard)
-
+  if (playerRequestCard.value === dealtCard.value) {
+    gameState[player].pairs.push(dealtCard, playerRequestCard)
+    gameState[player].hand = gameState[player].hand.filter(
+      (card: CardType) => card.id !== playerRequestCard.id
+    )
     return {
       gameState,
-      playerOutput: playerOutput.NoMatch,
+      playerOutput: playerOutput.DealtCardMatch,
     }
   }
 
-  if (playerRequest.player === 2) {
-    if (playerRequestCard.value === dealtCard.value) {
-      gameState.player2.pairs.push(dealtCard, playerRequestCard)
-      gameState.player2.hand = gameState.player2.hand.filter(
-        card => card.id !== playerRequestCard.id
+  for (const card of gameState[player].hand) {
+    if (dealtCard.value === card.value) {
+      gameState[player].pairs.push(dealtCard, card)
+      gameState[player].hand = gameState[player].hand.filter(
+        (cardInHand: CardType) => cardInHand.id !== card.id
       )
       return {
         gameState,
-        playerOutput: playerOutput.DealtCardMatch,
+        playerOutput: playerOutput.HandMatch,
       }
     }
+  }
 
-    for (const card of gameState.player2.hand) {
-      if (dealtCard.value === card.value) {
-        gameState.player2.pairs.push(dealtCard, card)
-        gameState.player2.hand = gameState.player2.hand.filter(
-          cardInHand => cardInHand.id !== card.id
-        )
-        return {
-          gameState,
-          playerOutput: playerOutput.HandMatch,
-        }
-      }
-    }
+  gameState[player].hand.push(dealtCard)
 
-    gameState.player2.hand.push(dealtCard)
-    return {
-      gameState,
-      playerOutput: playerOutput.NoMatch,
-    }
+  return {
+    gameState,
+    playerOutput: playerOutput.NoMatch,
   }
 }
 

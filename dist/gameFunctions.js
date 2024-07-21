@@ -1,49 +1,20 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const Card_1 = __importStar(require("./gameObjects/Card"));
-const Player_1 = __importDefault(require("./gameObjects/Player"));
-const enums_1 = require("./enums");
-const createDeck = () => {
+const createDeck = (Card, nonNumValue, suit) => {
     const deck = new Array(52);
     const non_num_cards = [
-        Card_1.nonNumValue.ace,
-        Card_1.nonNumValue.jack,
-        Card_1.nonNumValue.queen,
-        Card_1.nonNumValue.king,
+        nonNumValue.ace,
+        nonNumValue.jack,
+        nonNumValue.queen,
+        nonNumValue.king,
     ];
-    const suits = [Card_1.suit.clubs, Card_1.suit.diamonds, Card_1.suit.hearts, Card_1.suit.spades];
+    const suits = [suit.clubs, suit.diamonds, suit.hearts, suit.spades];
     let deckIndex = 0;
     const createSuits = (value) => {
         for (const suit of suits) {
             const id = `${value}_of_${suit}`;
-            const img = `./cards/${id}.png`;
-            deck[deckIndex] = new Card_1.default(id, value, suit, img);
+            const img = `./cards/${id}.webp`;
+            deck[deckIndex] = new Card(id, value, suit, img);
             deckIndex++;
         }
     };
@@ -71,28 +42,27 @@ const dealHand = (deck, handSize) => {
 };
 const initialPairs = (hand) => {
     const pairs = [];
-    hand.forEach(cardX => hand.forEach(cardY => {
+    hand.forEach(cardX => hand.some(cardY => {
         if (cardX.value === cardY.value &&
             cardX.suit !== cardY.suit &&
             !pairs.includes(cardX) &&
             !pairs.includes(cardY))
             pairs.push(cardX, cardY);
     }));
-    pairs.forEach(cardP => hand.forEach(cardH => {
-        if (cardP === cardH) {
+    pairs.forEach(cardP => hand.some(cardH => {
+        if (cardP === cardH)
             hand.splice(hand.indexOf(cardH), 1);
-        }
     }));
     return pairs;
 };
-const startGame = () => {
-    const shuffledDeck = shuffleDeck(createDeck());
+const startGame = (createDeck, shuffleDeck, dealHand, initialPairs, Card, Player, nonNumValue, suit) => {
+    const shuffledDeck = shuffleDeck(createDeck(Card, nonNumValue, suit));
     const player1Hand = dealHand(shuffledDeck, 7);
     const player2Hand = dealHand(shuffledDeck, 7);
     const player1Pairs = initialPairs(player1Hand);
     const player2Pairs = initialPairs(player2Hand);
-    const player1 = new Player_1.default(player1Hand, player1Pairs);
-    const player2 = new Player_1.default(player2Hand, player2Pairs);
+    const player1 = new Player(player1Hand, player1Pairs);
+    const player2 = new Player(player2Hand, player2Pairs);
     return {
         shuffledDeck,
         player1,
@@ -100,71 +70,51 @@ const startGame = () => {
     };
 };
 const handlePlayerMatchPairs = (playerRequest, playerMatch, gameState) => {
+    let player, opp;
     if (playerRequest.player === 1) {
-        gameState.player1.pairs.push(playerRequest.card, playerMatch.card);
-        gameState.player1.hand = gameState.player1.hand.filter(card => card.id !== playerRequest.card.id);
-        gameState.player2.hand = gameState.player2.hand.filter(card => card.id !== playerMatch.card.id);
+        player = "player1";
+        opp = "player2";
     }
     if (playerRequest.player === 2) {
-        gameState.player2.pairs.push(playerRequest.card, playerMatch.card);
-        gameState.player2.hand = gameState.player2.hand.filter(card => card.id !== playerRequest.card.id);
-        gameState.player1.hand = gameState.player1.hand.filter(card => card.id !== playerMatch.card.id);
+        player = "player2";
+        opp = "player1";
     }
+    gameState[player].pairs.push(playerRequest.card, playerMatch.card);
+    gameState[player].hand = gameState[player].hand.filter((card) => card.id !== playerRequest.card.id);
+    gameState[opp].hand = gameState[opp].hand.filter((card) => card.id !== playerMatch.card.id);
     return gameState;
 };
-const handleDealCard = (playerRequest, gameState) => {
+const handleDealCard = (playerRequest, gameState, dealCard, playerOutput) => {
     const playerRequestCard = playerRequest.card;
     const dealtCard = dealCard(gameState.shuffledDeck);
-    if (playerRequest.player === 1) {
-        if (playerRequestCard.value === dealtCard.value) {
-            gameState.player1.pairs.push(dealtCard, playerRequestCard);
-            gameState.player1.hand = gameState.player1.hand.filter(card => card.id !== playerRequestCard.id);
-            return {
-                gameState,
-                playerOutput: enums_1.playerOutput.DealtCardMatch,
-            };
-        }
-        for (const card of gameState.player1.hand) {
-            if (dealtCard.value === card.value) {
-                gameState.player1.pairs.push(dealtCard, card);
-                gameState.player1.hand = gameState.player1.hand.filter(cardInHand => cardInHand.id !== card.id);
-                return {
-                    gameState,
-                    playerOutput: enums_1.playerOutput.HandMatch,
-                };
-            }
-        }
-        gameState.player1.hand.push(dealtCard);
+    let player;
+    if (playerRequest.player === 1)
+        player = "player1";
+    if (playerRequest.player === 2)
+        player = "player2";
+    if (playerRequestCard.value === dealtCard.value) {
+        gameState[player].pairs.push(dealtCard, playerRequestCard);
+        gameState[player].hand = gameState[player].hand.filter((card) => card.id !== playerRequestCard.id);
         return {
             gameState,
-            playerOutput: enums_1.playerOutput.NoMatch,
+            playerOutput: playerOutput.DealtCardMatch,
         };
     }
-    if (playerRequest.player === 2) {
-        if (playerRequestCard.value === dealtCard.value) {
-            gameState.player2.pairs.push(dealtCard, playerRequestCard);
-            gameState.player2.hand = gameState.player2.hand.filter(card => card.id !== playerRequestCard.id);
+    for (const card of gameState[player].hand) {
+        if (dealtCard.value === card.value) {
+            gameState[player].pairs.push(dealtCard, card);
+            gameState[player].hand = gameState[player].hand.filter((cardInHand) => cardInHand.id !== card.id);
             return {
                 gameState,
-                playerOutput: enums_1.playerOutput.DealtCardMatch,
+                playerOutput: playerOutput.HandMatch,
             };
         }
-        for (const card of gameState.player2.hand) {
-            if (dealtCard.value === card.value) {
-                gameState.player2.pairs.push(dealtCard, card);
-                gameState.player2.hand = gameState.player2.hand.filter(cardInHand => cardInHand.id !== card.id);
-                return {
-                    gameState,
-                    playerOutput: enums_1.playerOutput.HandMatch,
-                };
-            }
-        }
-        gameState.player2.hand.push(dealtCard);
-        return {
-            gameState,
-            playerOutput: enums_1.playerOutput.NoMatch,
-        };
     }
+    gameState[player].hand.push(dealtCard);
+    return {
+        gameState,
+        playerOutput: playerOutput.NoMatch,
+    };
 };
 exports.default = {
     createDeck,
