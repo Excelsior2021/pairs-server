@@ -1,19 +1,24 @@
-import type { gameState, playerMatch, playerRequest } from "@/types/index.d.ts"
+import type {
+  createDeck,
+  dealCard,
+  dealHand,
+  dealHand,
+  gameState,
+  initialPairs,
+  playerMatch,
+  playerRequest,
+  shuffleDeck,
+  startGame,
+} from "@/types/index.d.ts"
 import type CardType from "@/game-objects/card.ts"
 import {
   type nonNumValue as nonNumValueType,
-  type suit as suitType,
   type playerOutput as playerOutputType,
   playerID,
   playerServer,
 } from "@/enums/index.ts"
-import type PlayerType from "@/game-objects/player.ts"
 
-const createDeck = (
-  Card: typeof CardType,
-  nonNumValue: typeof nonNumValueType,
-  suit: typeof suitType
-) => {
+const createDeck: createDeck = (Card, nonNumValue, suit) => {
   const deck: CardType[] = new Array(52)
   const non_num_cards = [
     nonNumValue.ace,
@@ -40,7 +45,7 @@ const createDeck = (
   return deck
 }
 
-const shuffleDeck = (deck: CardType[]) => {
+const shuffleDeck: shuffleDeck = deck => {
   for (const x in deck) {
     const y = Math.floor(Math.random() * parseInt(x))
     const temp = deck[x]
@@ -50,15 +55,18 @@ const shuffleDeck = (deck: CardType[]) => {
   return deck
 }
 
-const dealCard = (deck: CardType[]) => deck.pop()
+const dealCard: dealCard = (deck: CardType[]) => {
+  if (deck.length === 0) return //handle empty deck
+  return deck.pop()
+}
 
-const dealHand = (deck: CardType[], handSize: number) => {
+const dealHand: dealHand = (dealCard, deck, handSize) => {
   const hand: CardType[] = new Array(handSize)
   for (let i = 0; i < handSize; i++) hand[i] = dealCard(deck)!
   return hand
 }
 
-const initialPairs = (hand: CardType[]) => {
+const initialPairs: initialPairs = hand => {
   const pairs: CardType[] = []
   hand.forEach(cardX =>
     hand.some(cardY => {
@@ -80,20 +88,21 @@ const initialPairs = (hand: CardType[]) => {
   return pairs
 }
 
-const startGame = (
+const startGame: startGame = (
   createDeck,
   shuffleDeck,
+  dealCard,
   dealHand,
   initialPairs,
-  Card: typeof CardType,
-  Player: typeof PlayerType,
-  nonNumValue: typeof nonNumValueType,
-  suit: typeof suitType
+  Card,
+  Player,
+  nonNumValue,
+  suit
 ) => {
   const shuffledDeck = shuffleDeck(createDeck(Card, nonNumValue, suit))
 
-  const player1Hand = dealHand(shuffledDeck, 7)
-  const player2Hand = dealHand(shuffledDeck, 7)
+  const player1Hand = dealHand(dealCard, shuffledDeck, 7)
+  const player2Hand = dealHand(dealCard, shuffledDeck, 7)
 
   const player1Pairs = initialPairs(player1Hand)
   const player2Pairs = initialPairs(player2Hand)
@@ -142,7 +151,7 @@ const handlePlayerMatchPairs = (
 const handleDealCard = (
   playerRequest: playerRequest,
   gameState: gameState,
-  dealCard,
+  dealCard: dealCard,
   playerOutput: typeof playerOutputType
 ) => {
   const playerRequestCard = playerRequest.card

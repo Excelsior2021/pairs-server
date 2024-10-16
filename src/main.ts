@@ -47,6 +47,7 @@ io.on("connection", socket => {
         const initialGameState = game.startGame(
           game.createDeck,
           game.shuffleDeck,
+          game.dealCard,
           game.dealHand,
           game.initialPairs,
           Card,
