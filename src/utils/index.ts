@@ -1,25 +1,23 @@
-import type { gameStateClient } from "@/types/index.d.ts"
+import { playerClient, playerID, playerServer } from "@/enums/index.ts"
+import type { gameState } from "@/types/index.d.ts"
 
-export const gameStateRemap = (
-  gameState: gameStateClient,
-  clientPlayer: number
-) => {
-  const remappedGameState: any = {}
+export const gameStateRemap = (gameState: gameState, clientPlayer: number) => {
+  const remappedGameState = <gameState>{}
   let player: string
   let opp: string
 
-  if (clientPlayer === 1) {
-    player = "player1"
-    opp = "player2"
-  }
-  if (clientPlayer === 2) {
-    player = "player2"
-    opp = "player1"
-  }
+  if (clientPlayer === playerID.player1) {
+    player = playerServer.player1
+    opp = playerServer.player2
+  } else if (clientPlayer === playerID.player2) {
+    player = playerServer.player2
+    opp = playerServer.player1
+  } else return //implement error handling
 
   for (const key in gameState) {
-    if (key === "player") remappedGameState[player] = gameState[key]
-    else if (key === "opponent") remappedGameState[opp] = gameState[key]
+    if (key === playerClient.player) remappedGameState[player] = gameState[key]
+    else if (key === playerClient.opponent)
+      remappedGameState[opp] = gameState[key]
     else remappedGameState[key] = gameState[key]
   }
   return remappedGameState

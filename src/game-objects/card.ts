@@ -1,17 +1,4 @@
-export enum suit {
-  clubs = "clubs",
-  diamonds = "diamonds",
-  hearts = "hearts",
-  spades = "spades",
-}
-
-export enum nonNumValue {
-  ace = "ace",
-  jack = "jack",
-  queen = "queen",
-  king = "king",
-}
-
+import type { suit, nonNumValue } from "@/enums/index.ts"
 export default class Card {
   id: string
   value: string | number

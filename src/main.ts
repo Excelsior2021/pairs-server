@@ -1,13 +1,19 @@
 import { Server } from "socket.io"
 import game from "@/game-functions/index.ts"
 import { gameStateRemap } from "@/utils/index.ts"
-import { Card, Player, nonNumValue, suit } from "@/game-objects/index.ts"
-import { playerOutput as playerOutputEnum } from "@/enums/index.ts"
+import { Card, Player } from "@/game-objects/index.ts"
+import {
+  nonNumValue,
+  suit,
+  playerOutput as playerOutputEnum,
+  playerID,
+} from "@/enums/index.ts"
 import "@std/dotenv/load"
 import type {
   session,
   playerRequest,
-  gameStateClient,
+  gameState,
+  playerMatch,
 } from "@/types/index.d.ts"
 
 const io = new Server({
@@ -20,13 +26,22 @@ const playerSocketsIDs: string[] = []
 const sessions: session[] = []
 
 io.on("connection", socket => {
+  //on connection, socket is added to playerSocketsIDs
   playerSocketsIDs.push(socket.id)
   console.log("sockets: ", playerSocketsIDs)
 
+  //creates a session for socket
+  socket.on("create_session", (sessionID: string) => {
+    sessions.push({ sessionID, playerSocketsIDs: [socket.id] })
+    socket.join(sessionID)
+    socket.emit("set_player", playerID.player1)
+  })
+
+  //socket joins existing session and game starts
   socket.on("join_session", (sessionID: string) => {
     for (let i = 0; i < sessions.length; i++) {
       if (sessions[i].sessionID === sessionID) {
-        socket.emit("sessionID-exists")
+        socket.emit("sessionID_exists")
         socket.join(sessionID)
         sessions[i].playerSocketsIDs.push(socket.id)
         const initialGameState = game.startGame(
@@ -39,7 +54,7 @@ io.on("connection", socket => {
           nonNumValue,
           suit
         )
-        socket.emit("setPlayer", 2)
+        socket.emit("set_player", playerID.player2)
         const playerTurn = Math.ceil(Math.random() * 2)
         io.sockets
           .in(sessionID)
@@ -47,13 +62,8 @@ io.on("connection", socket => {
         return
       }
     }
-    socket.emit("no-sessionID")
-  })
-
-  socket.on("create_session", (sessionID: string) => {
-    sessions.push({ sessionID, playerSocketsIDs: [socket.id] })
-    socket.join(sessionID)
-    socket.emit("setPlayer", 1)
+    //if requested session ID does not exist
+    socket.emit("no_sessionID")
   })
 
   socket.on("recieve_sessionID", () => socket.emit("recieved_sessionID"))
@@ -70,8 +80,8 @@ io.on("connection", socket => {
     "player_match",
     (
       playerRequest: playerRequest,
-      playerMatch: any,
-      gameState: gameStateClient,
+      playerMatch: playerMatch,
+      gameState: gameState,
       playerOutput: number,
       sessionID: string
     ) => {
@@ -99,11 +109,7 @@ io.on("connection", socket => {
 
   socket.on(
     "player_dealt",
-    (
-      playerRequest: playerRequest,
-      gameState: gameStateClient,
-      sessionID: string
-    ) => {
+    (playerRequest: playerRequest, gameState: gameState, sessionID: string) => {
       const gameStateRemapped = gameStateRemap(gameState, playerRequest.player)
       const dealt = game.handleDealCard(
         playerRequest,

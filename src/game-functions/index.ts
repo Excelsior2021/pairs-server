@@ -1,10 +1,12 @@
-import type { playerOutput as playerOutputType } from "@/enums/index.ts"
-import type { gameStateServer, playerRequest } from "@/types/index.d.ts"
+import type { gameState, playerMatch, playerRequest } from "@/types/index.d.ts"
 import type CardType from "@/game-objects/card.ts"
-import type {
-  nonNumValue as nonNumValueType,
-  suit as suitType,
-} from "@/game-objects/card.ts"
+import {
+  type nonNumValue as nonNumValueType,
+  type suit as suitType,
+  type playerOutput as playerOutputType,
+  playerID,
+  playerServer,
+} from "@/enums/index.ts"
 import type PlayerType from "@/game-objects/player.ts"
 
 const createDeck = (
@@ -108,19 +110,20 @@ const startGame = (
 
 const handlePlayerMatchPairs = (
   playerRequest: playerRequest,
-  playerMatch: playerRequest,
-  gameState: gameStateServer
+  playerMatch: playerMatch,
+  gameState: gameState
 ) => {
   let player: string, opp: string
 
-  if (playerRequest.player === 1) {
-    player = "player1"
-    opp = "player2"
-  }
-
-  if (playerRequest.player === 2) {
-    player = "player2"
-    opp = "player1"
+  if (playerRequest.player === playerID.player1) {
+    player = playerServer.player1
+    opp = playerServer.player2
+  } else if (playerRequest.player === playerID.player2) {
+    player = playerServer.player2
+    opp = playerServer.player1
+  } else {
+    //implement error handling
+    return
   }
 
   gameState[player].pairs.push(playerRequest.card, playerMatch.card)
@@ -138,7 +141,7 @@ const handlePlayerMatchPairs = (
 
 const handleDealCard = (
   playerRequest: playerRequest,
-  gameState: gameStateServer,
+  gameState: gameState,
   dealCard,
   playerOutput: typeof playerOutputType
 ) => {
@@ -147,8 +150,11 @@ const handleDealCard = (
 
   let player: string
 
-  if (playerRequest.player === 1) player = "player1"
-  if (playerRequest.player === 2) player = "player2"
+  if (playerRequest.player === playerID.player1) player = playerServer.player1
+  else if (playerRequest.player === playerID.player2)
+    player = playerServer.player2
+  //implement error handling
+  else return
 
   if (playerRequestCard.value === dealtCard.value) {
     gameState[player].pairs.push(dealtCard, playerRequestCard)

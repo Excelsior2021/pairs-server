@@ -10,14 +10,15 @@ export type playerRequest = {
   card: Card
 }
 
-export type gameStateClient = {
-  player: Player
-  opponent: Player
-  shuffledDeck: Card[]
+export type playerMatch = {
+  clientPlayer: number
+  card: Card
 }
 
-export type gameStateServer = {
-  player1: Player
-  player2: Player
+type gameStatePlayers = {
+  [player: string]: Player
+}
+
+export type gameState = gameStatePlayers & {
   shuffledDeck: Card[]
 }
