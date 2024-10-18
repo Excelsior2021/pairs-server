@@ -2,23 +2,26 @@ import type {
   createDeck,
   dealCard,
   dealHand,
-  dealHand,
-  gameState,
   initialPairs,
-  playerMatch,
-  playerRequest,
   shuffleDeck,
   startGame,
+  createSuits,
+  handlePlayerMatchPairs,
+  handleDealCard,
 } from "@/types/index.d.ts"
 import type CardType from "@/game-objects/card.ts"
-import {
-  type nonNumValue as nonNumValueType,
-  type playerOutput as playerOutputType,
-  playerID,
-  playerServer,
-} from "@/enums/index.ts"
 
-const createDeck: createDeck = (Card, nonNumValue, suit) => {
+const createSuits: createSuits = (Card, value, deck, deckIndex, suits) => {
+  for (const suit of suits) {
+    const id = `${value}_of_${suit}`
+    const img = `./cards/${id}.webp`
+    deck[deckIndex] = new Card(id, value, suit, img)
+    deckIndex++
+  }
+  return deckIndex
+}
+
+const createDeck: createDeck = (createSuits, Card, nonNumValue, suit) => {
   const deck: CardType[] = new Array(52)
   const non_num_cards = [
     nonNumValue.ace,
@@ -29,18 +32,11 @@ const createDeck: createDeck = (Card, nonNumValue, suit) => {
   const suits = [suit.clubs, suit.diamonds, suit.hearts, suit.spades]
   let deckIndex = 0
 
-  const createSuits = (value: number | nonNumValueType) => {
-    for (const suit of suits) {
-      const id = `${value}_of_${suit}`
-      const img = `./cards/${id}.webp`
-      deck[deckIndex] = new Card(id, value, suit, img)
-      deckIndex++
-    }
-  }
+  for (const value of non_num_cards)
+    deckIndex = createSuits(Card, value, deck, deckIndex, suits)
 
-  for (const value of non_num_cards) createSuits(value)
-
-  for (let value = 2; value < 11; value++) createSuits(value)
+  for (let value = 2; value < 11; value++)
+    deckIndex = createSuits(Card, value, deck, deckIndex, suits)
 
   return deck
 }
@@ -56,7 +52,7 @@ const shuffleDeck: shuffleDeck = deck => {
 }
 
 const dealCard: dealCard = (deck: CardType[]) => {
-  if (deck.length === 0) return //handle empty deck
+  if (deck.length === 0) return //handle
   return deck.pop()
 }
 
@@ -89,6 +85,7 @@ const initialPairs: initialPairs = hand => {
 }
 
 const startGame: startGame = (
+  createSuits,
   createDeck,
   shuffleDeck,
   dealCard,
@@ -99,7 +96,8 @@ const startGame: startGame = (
   nonNumValue,
   suit
 ) => {
-  const shuffledDeck = shuffleDeck(createDeck(Card, nonNumValue, suit))
+  const deck = createDeck(createSuits, Card, nonNumValue, suit)
+  const shuffledDeck = shuffleDeck(deck)
 
   const player1Hand = dealHand(dealCard, shuffledDeck, 7)
   const player2Hand = dealHand(dealCard, shuffledDeck, 7)
@@ -117,10 +115,12 @@ const startGame: startGame = (
   }
 }
 
-const handlePlayerMatchPairs = (
-  playerRequest: playerRequest,
-  playerMatch: playerMatch,
-  gameState: gameState
+const handlePlayerMatchPairs: handlePlayerMatchPairs = (
+  playerRequest,
+  playerMatch,
+  gameState,
+  playerID,
+  playerServer
 ) => {
   let player: string, opp: string
 
@@ -132,7 +132,7 @@ const handlePlayerMatchPairs = (
     opp = playerServer.player1
   } else {
     //implement error handling
-    return
+    return gameState
   }
 
   gameState[player].pairs.push(playerRequest.card, playerMatch.card)
@@ -148,14 +148,18 @@ const handlePlayerMatchPairs = (
   return gameState
 }
 
-const handleDealCard = (
-  playerRequest: playerRequest,
-  gameState: gameState,
-  dealCard: dealCard,
-  playerOutput: typeof playerOutputType
+const handleDealCard: handleDealCard = (
+  playerRequest,
+  gameState,
+  dealCard,
+  playerOutput,
+  playerID,
+  playerServer
 ) => {
+  if (gameState.shuffledDeck.length === 0) return
+
   const playerRequestCard = playerRequest.card
-  const dealtCard = dealCard(gameState.shuffledDeck)
+  const dealtCard = dealCard(gameState.shuffledDeck)!
 
   let player: string
 
@@ -198,6 +202,7 @@ const handleDealCard = (
 }
 
 export default {
+  createSuits,
   createDeck,
   shuffleDeck,
   dealCard,
