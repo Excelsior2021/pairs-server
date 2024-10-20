@@ -30,6 +30,12 @@ type gameStatePlayers = {
   [player: string]: PlayerType
 }
 
+type gameStateClient = {
+  player: PlayerType
+  opponent: PlayerType
+  shuffledDeck: CardType[]
+}
+
 export type gameState = gameStatePlayers & {
   shuffledDeck: CardType[]
 }

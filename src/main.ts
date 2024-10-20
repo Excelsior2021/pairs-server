@@ -118,8 +118,16 @@ io.on("connection", socket => {
 
   socket.on(
     "player_dealt",
-    (playerRequest: playerRequest, gameState: gameState, sessionID: string) => {
-      const gameStateServer = gameStateRemap(gameState, playerRequest.player)
+    (
+      playerRequest: playerRequest,
+      gameStateClient: gameState,
+      sessionID: string
+    ) => {
+      const gameStateServer = gameStateRemap(
+        gameStateClient,
+        playerRequest.player
+      )
+
       const dealt = game.handleDealCard(
         playerRequest,
         gameStateServer,
