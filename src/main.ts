@@ -168,13 +168,13 @@ io.on("connection", socket => {
       socket.to(sessionID).emit("player_disconnected")
       delete sessions[sessionID]
     }
-    console.log(`sessions: ${sessions}`)
+    console.log(`sessions: ${JSON.stringify(sessions)}`)
   })
 
   //remove socket from playerSocketsIDs
   socket.on("disconnect", () => {
     playerSocketsIDs.splice(playerSocketsIDs.indexOf(socket.id), 1)
-    console.log(`sockets: ${playerSocketsIDs}`)
+    console.log("sockets: ", playerSocketsIDs)
   })
 })
 
