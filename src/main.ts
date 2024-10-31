@@ -169,6 +169,7 @@ io.on("connection", socket => {
       delete sessions[sessionID]
     }
     console.log(`sessions: ${JSON.stringify(sessions)}`)
+    socket.disconnect()
   })
 
   //remove socket from playerSocketsIDs
