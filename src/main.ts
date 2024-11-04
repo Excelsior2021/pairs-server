@@ -161,21 +161,19 @@ io.on("connection", socket => {
     socket.to(sessionID).emit("player_turn_switch", playerTurn)
   )
 
-  //remove session
-  socket.on("player_disconnect", (sessionID: string) => {
-    const session = sessions[sessionID]
-    if (session) {
-      socket.to(sessionID).emit("player_disconnected")
-      delete sessions[sessionID]
-    }
-    console.log(`sessions: ${JSON.stringify(sessions)}`)
-    socket.disconnect()
-  })
-
-  //remove socket from playerSocketsIDs
+  //remove socket from playerSocketsIDs and delete session
   socket.on("disconnect", () => {
+    for (const session in sessions)
+      if (sessions[session].playerSocketsIDs.length < 2) {
+        delete sessions[session]
+      } else if (sessions[session].playerSocketsIDs.includes(socket.id)) {
+        socket.to(session).emit("player_disconnected")
+        delete sessions[session]
+      }
+
     playerSocketsIDs.splice(playerSocketsIDs.indexOf(socket.id), 1)
     console.log("sockets: ", playerSocketsIDs)
+    console.log(`sessions: ${JSON.stringify(sessions)}`)
   })
 })
 
