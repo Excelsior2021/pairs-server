@@ -56,9 +56,8 @@ const dealCard: dealCard = (deck: CardType[]) => {
   return deck.pop()
 }
 
-const dealHand: dealHand = (dealCard, deck, handSize) => {
-  const hand: CardType[] = new Array(handSize)
-  for (let i = 0; i < handSize; i++) hand[i] = dealCard(deck)!
+const dealHand: dealHand = (deck, handSize) => {
+  const hand: CardType[] = deck.splice(0, handSize)
   return hand
 }
 
@@ -88,7 +87,6 @@ const startGame: startGame = (
   createSuits,
   createDeck,
   shuffleDeck,
-  dealCard,
   dealHand,
   initialPairs,
   Card,
@@ -99,8 +97,8 @@ const startGame: startGame = (
   const deck = createDeck(createSuits, Card, nonNumValue, suit)
   const shuffledDeck = shuffleDeck(deck)
 
-  const player1Hand = dealHand(dealCard, shuffledDeck, 7)
-  const player2Hand = dealHand(dealCard, shuffledDeck, 7)
+  const player1Hand = dealHand(shuffledDeck, 7)
+  const player2Hand = dealHand(shuffledDeck, 7)
 
   const player1Pairs = initialPairs(player1Hand)
   const player2Pairs = initialPairs(player2Hand)

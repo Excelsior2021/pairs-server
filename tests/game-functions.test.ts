@@ -12,7 +12,7 @@ import {
   playerServer,
 } from "@/enums/index.ts"
 import mockDeck from "./__mocks__/deck.ts"
-import type { gameState } from "@/types/index.d.ts"
+import type { gameState, playerRequest } from "@/types/index.d.ts"
 
 describe("gameFunctions", () => {
   let deck: Card[]
@@ -20,6 +20,20 @@ describe("gameFunctions", () => {
 
   beforeEach(() => {
     deck = game.createDeck(createSuitsSpy, Card, nonNumValue, suit)
+  })
+
+  describe("createSuits()", () => {
+    const deck: Card[] = []
+    const value = nonNumValue.ace
+    let deckIndex = 0
+    const suits = [suit.clubs, suit.diamonds, suit.hearts, suit.spades]
+
+    deckIndex = game.createSuits(Card, value, deck, deckIndex, suits)
+
+    expect(deckIndex).toBe(4)
+    expect(JSON.stringify(deck)).toStrictEqual(
+      JSON.stringify(mockDeck.slice(0, 4))
+    )
   })
 
   describe("createDeck()", () => {
@@ -37,8 +51,9 @@ describe("gameFunctions", () => {
   })
 
   describe("dealHand()", () => {
+    const handSize = 7
     it("returns the specified amount of cards for a hand", () => {
-      expect(game.dealHand(game.dealCard, deck, 7)).toHaveLength(7)
+      expect(game.dealHand(deck, handSize)).toHaveLength(handSize)
     })
   })
 
@@ -101,14 +116,12 @@ describe("gameFunctions", () => {
     const player2 = new Player(hand, pairs)
     const createDeckSpy = spy(game.createDeck)
     const shuffleDeckStub = spy(() => shuffledDeck)
-    const dealCardStub = spy(game.dealCard)
     const dealHandStub = spy(() => hand)
     const initialPairsStub = spy(() => pairs)
     const startGame = game.startGame(
       createSuitsSpy,
       createDeckSpy,
       shuffleDeckStub,
-      dealCardStub,
       dealHandStub,
       initialPairsStub,
       Card,
@@ -210,7 +223,7 @@ describe("gameFunctions", () => {
         id: 1,
         value: 1,
       },
-    } as any
+    } as playerRequest
 
     test("match with dealt card", () => {
       const gameState = {

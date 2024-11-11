@@ -59,11 +59,7 @@ export type shuffleDeck = (deck: CardType[]) => CardType[]
 
 export type dealCard = (deck: CardType[]) => CardType | undefined
 
-export type dealHand = (
-  dealCard: dealCard,
-  deck: CardType[],
-  handSize: number
-) => CardType[]
+export type dealHand = (deck: CardType[], handSize: number) => CardType[]
 
 export type initialPairs = (hand: CardType[]) => CardType[]
 
@@ -71,7 +67,6 @@ export type startGame = (
   createSuits: createSuits,
   createDeck: createDeck,
   shuffleDeck: shuffleDeck,
-  dealCard: dealCard,
   dealHand: dealHand,
   initialPairs: initialPairs,
   Card: typeof CardType,

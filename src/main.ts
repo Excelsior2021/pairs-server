@@ -49,7 +49,6 @@ io.on("connection", socket => {
         game.createSuits,
         game.createDeck,
         game.shuffleDeck,
-        game.dealCard,
         game.dealHand,
         game.initialPairs,
         Card,
@@ -91,6 +90,7 @@ io.on("connection", socket => {
         gameStateClient,
         playerMatch.clientPlayer
       )
+
       const newGameStateClient = game.handlePlayerMatchPairs(
         playerRequest,
         playerMatch,
