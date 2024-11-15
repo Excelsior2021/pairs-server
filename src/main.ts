@@ -36,6 +36,7 @@ io.on("connection", socket => {
     sessions[sessionID] = { playerSocketsIDs: [socket.id] }
     socket.join(sessionID)
     socket.emit("set_player", playerID.player1)
+    console.log(sessions)
   })
 
   //socket joins existing session and game starts
@@ -162,9 +163,7 @@ io.on("connection", socket => {
   //remove socket from playerSocketsIDs and delete session
   socket.on("disconnect", () => {
     for (const session in sessions)
-      if (sessions[session].playerSocketsIDs.length < 2) {
-        delete sessions[session]
-      } else if (sessions[session].playerSocketsIDs.includes(socket.id)) {
+      if (sessions[session].playerSocketsIDs.includes(socket.id)) {
         socket.to(session).emit("player_disconnected")
         delete sessions[session]
       }
