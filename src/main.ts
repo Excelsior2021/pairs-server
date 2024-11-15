@@ -42,8 +42,8 @@ io.on("connection", socket => {
   socket.on("join_session", (sessionID: string) => {
     const session = sessions[sessionID]
     if (session) {
-      socket.emit("sessionID_exists")
       socket.join(sessionID)
+      socket.emit("sessionID_exists")
       session.playerSocketsIDs.push(socket.id)
       const initialGameState = game.startGame(
         game.createSuits,
@@ -65,8 +65,6 @@ io.on("connection", socket => {
     //if requested session ID does not exist
     else socket.emit("no_sessionID")
   })
-
-  socket.on("recieve_sessionID", () => socket.emit("recieved_sessionID"))
 
   //card request from one player to the other
   socket.on(
