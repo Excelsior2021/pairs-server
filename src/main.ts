@@ -17,13 +17,15 @@ import type {
   session,
 } from "@/types/index.d.ts"
 
+console.log(Deno.env.get("ALLOWED_ORIGINS"))
+console.log(typeof Deno.env.get("ALLOWED_ORIGINS"))
+
 const port = Deno.env.get("PORT") || 8080
 const io = new Server(Number(port), {
   cors: {
-    origin:
-      Deno.env.get("ENV") === "development"
-        ? "*"
-        : [Deno.env.get("ALLOWED_ORIGINS")],
+    origin: Deno.env.get("ALLOWED_ORIGINS")
+      ? JSON.parse(Deno.env.get("ALLOWED_ORIGINS")!)
+      : "",
   },
 })
 console.log(`listening on port: ${port}`)
