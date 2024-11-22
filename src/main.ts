@@ -1,7 +1,6 @@
 import { Server } from "socket.io"
 import game from "@/game-functions/index.ts"
 import { gameStateRemap } from "@/utils/index.ts"
-import { Card, Player } from "@/game-objects/index.ts"
 import {
   nonNumValue,
   suit,
@@ -11,18 +10,24 @@ import {
 } from "@/enums/index.ts"
 import "@std/dotenv/load"
 import type {
+  card,
   playerRequest,
   gameState,
   playerMatch,
   session,
 } from "@/types/index.d.ts"
 
-const io = new Server({
+const port = Deno.env.get("PORT") || 8080
+const io = new Server(Number(port), {
   cors: {
-    origin: "*",
+    origin:
+      Deno.env.get("ENV") === "development"
+        ? "*"
+        : [Deno.env.get("ALLOWED_ORIGINS")],
   },
 })
-const port = Deno.env.get("PORT") || 8080
+console.log(`listening on port: ${port}`)
+
 const playerSocketsIDs: string[] = []
 const sessions: session = {}
 
@@ -52,8 +57,6 @@ io.on("connection", socket => {
         game.shuffleDeck,
         game.dealHand,
         game.initialPairs,
-        Card,
-        Player,
         nonNumValue,
         suit
       )
@@ -70,7 +73,7 @@ io.on("connection", socket => {
   //card request from one player to the other
   socket.on(
     "player_request",
-    (player: number, card: Card, sessionID: string) => {
+    (player: number, card: card, sessionID: string) => {
       const playerRequest = { player, card }
       socket.to(sessionID).emit("player_requested", playerRequest)
     }
@@ -85,27 +88,31 @@ io.on("connection", socket => {
       playerOutput: number,
       sessionID: string
     ) => {
-      const gameStateServer = gameStateRemap(
-        gameStateClient,
-        playerMatch.clientPlayer
-      )
-
-      const newGameStateClient = game.handlePlayerMatchPairs(
-        playerRequest,
-        playerMatch,
-        gameStateServer,
-        playerID,
-        playerServer
-      )
-
-      io.sockets
-        .in(sessionID)
-        .emit(
-          "player_match",
-          newGameStateClient,
-          playerOutput,
-          playerRequest.player
+      try {
+        const gameStateServer = gameStateRemap(
+          gameStateClient,
+          playerMatch.clientPlayer
         )
+
+        const newGameStateClient = game.handleplayerMatchPairs(
+          playerRequest,
+          playerMatch,
+          gameStateServer,
+          playerID,
+          playerServer
+        )
+
+        io.sockets
+          .in(sessionID)
+          .emit(
+            "player_match",
+            newGameStateClient,
+            playerOutput,
+            playerRequest.player
+          )
+      } catch (error) {
+        console.error(error)
+      }
     }
   )
 
@@ -127,10 +134,10 @@ io.on("connection", socket => {
         playerRequest.player
       )
 
-      const dealt = game.handleDealCard(
+      const dealt = game.handleDealcard(
         playerRequest,
         gameStateServer,
-        game.dealCard,
+        game.dealcard,
         playerOutputEnum,
         playerID,
         playerServer
@@ -173,6 +180,3 @@ io.on("connection", socket => {
     console.log(`sessions: ${JSON.stringify(sessions)}`)
   })
 })
-
-io.listen(Number(port))
-console.log(`listening on port: ${port}`)

@@ -1,12 +1,11 @@
-//@ts-nocheck:
+// @ts-nocheck:
 import { expect } from "jsr:@std/expect"
 import { describe, it } from "jsr:@std/testing/bdd"
 import { gameStateRemap } from "@/utils/index.ts"
-import type { gameState } from "@/types/index.d.ts"
-import type { Card, Player } from "@/game-objects/index.ts"
+import type { card, player, gameState } from "@/types/index.d.ts"
 
 describe("utils", () => {
-  const player: Player = {
+  const player: player = {
     hand: [
       {
         id: "4_of_clubs",
@@ -36,7 +35,7 @@ describe("utils", () => {
       },
     ],
   }
-  const opponent: Player = {
+  const opponent: player = {
     hand: [
       {
         id: "8_of_clubs",
@@ -66,7 +65,7 @@ describe("utils", () => {
       },
     ],
   }
-  const shuffledDeck: Card[] = []
+  const shuffledDeck: card[] = []
 
   const initialGameState: gameState = {
     player,

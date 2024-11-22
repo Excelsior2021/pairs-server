@@ -1,14 +1,23 @@
 import type {
-  Card as CardType,
-  Player as PlayerType,
-} from "@/game-objects/index.ts"
-import type {
+  nonNumValue,
   nonNumValue as nonNumValueType,
   playerID as playerIDType,
-  playerOutput as playerOutputType,
   playerServer as playerServerType,
+  playerOutput as playerOutputType,
   suit as suitType,
 } from "@/enums/index.ts"
+
+export type card = {
+  id: string
+  value: nonNumValue | number
+  suit: suitType
+  img: string
+}
+
+export type player = {
+  hand: card[]
+  pairs: card[]
+}
 
 export type session = {
   [sessionID: string]: {
@@ -18,50 +27,48 @@ export type session = {
 
 export type playerRequest = {
   player: number
-  card: CardType
+  card: card
 }
 
 export type playerMatch = {
   clientPlayer: number
-  card: CardType
+  card: card
 }
 
-type gameStatePlayers = {
-  [player: string]: PlayerType
+type gameStateplayers = {
+  [player: string]: player
 }
 
 type gameStateClient = {
-  player: PlayerType
-  opponent: PlayerType
-  shuffledDeck: CardType[]
+  player: player
+  opponent: player
+  shuffledDeck: card[]
 }
 
-export type gameState = gameStatePlayers & {
-  shuffledDeck: CardType[]
+export type gameState = gameStateplayers & {
+  shuffledDeck: card[]
 }
 
 export type createSuits = (
-  Card: typeof CardType,
   value: number | nonNumValueType,
-  deck: CardType[],
+  deck: card[],
   deckIndex: number,
   suits: suitType[]
 ) => number
 
 export type createDeck = (
   createSuits: createSuits,
-  Card: typeof CardType,
   nonNumValue: typeof nonNumValueType,
   suit: typeof suitType
-) => CardType[]
+) => card[]
 
-export type shuffleDeck = (deck: CardType[]) => CardType[]
+export type shuffleDeck = (deck: card[]) => card[]
 
-export type dealCard = (deck: CardType[]) => CardType | undefined
+export type dealcard = (deck: card[]) => card | undefined
 
-export type dealHand = (deck: CardType[], handSize: number) => CardType[]
+export type dealHand = (deck: card[], handSize: number) => card[]
 
-export type initialPairs = (hand: CardType[]) => CardType[]
+export type initialPairs = (hand: card[]) => card[]
 
 export type startGame = (
   createSuits: createSuits,
@@ -69,17 +76,15 @@ export type startGame = (
   shuffleDeck: shuffleDeck,
   dealHand: dealHand,
   initialPairs: initialPairs,
-  Card: typeof CardType,
-  Player: typeof PlayerType,
   nonNumValue: typeof nonNumValueType,
   suit: typeof suitType
 ) => {
-  shuffledDeck: CardType[]
-  player1: PlayerType
-  player2: PlayerType
+  shuffledDeck: card[]
+  player1: player
+  player2: player
 }
 
-export type handlePlayerMatchPairs = (
+export type handleplayerMatchPairs = (
   playerRequest: playerRequest,
   playerMatch: playerMatch,
   gameState: gameState,
@@ -87,10 +92,10 @@ export type handlePlayerMatchPairs = (
   playerServer: typeof playerServerType
 ) => gameState | undefined
 
-export type handleDealCard = (
+export type handleDealcard = (
   playerRequest: playerRequest,
   gameState: gameState,
-  dealCard: dealCard,
+  dealcard: dealcard,
   playerOutput: typeof playerOutputType,
   playerID: typeof playerIDType,
   playerServer: typeof playerServerType

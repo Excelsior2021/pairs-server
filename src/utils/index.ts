@@ -12,7 +12,7 @@ export const gameStateRemap = (gameState: gameState, clientPlayer: number) => {
   } else if (clientPlayer === playerID.player2) {
     player = playerServer.player2
     opp = playerServer.player1
-  } else return gameState //implement error handling
+  } else throw new Error("clientPlayer can not be determined")
 
   for (const key in gameState) {
     if (key === playerClient.player) remappedGameState[player] = gameState[key]
@@ -20,5 +20,6 @@ export const gameStateRemap = (gameState: gameState, clientPlayer: number) => {
       remappedGameState[opp] = gameState[key]
     else remappedGameState[key] = gameState[key]
   }
+
   return remappedGameState
 }

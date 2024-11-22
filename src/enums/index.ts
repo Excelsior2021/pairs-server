@@ -1,5 +1,5 @@
 export enum playerOutput {
-  DealtCardMatch = 1,
+  DealtcardMatch = 1,
   HandMatch,
   NoMatch,
 }
