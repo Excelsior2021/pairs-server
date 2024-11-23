@@ -1,4 +1,6 @@
 import { Server } from "socket.io"
+import { serve } from "https://deno.land/std@0.150.0/http/server.ts"
+import eventCb from "@/event-cb/index.ts"
 import game from "@/game-functions/index.ts"
 import { gameStateRemap } from "@/utils/index.ts"
 import {
@@ -7,83 +9,67 @@ import {
   playerOutput as playerOutputEnum,
   playerID,
   playerServer,
+  socketEvent,
 } from "@/enums/index.ts"
 import "@std/dotenv/load"
 import type {
-  card,
   playerRequest,
   gameState,
   playerMatch,
   session,
+  gameStateClient,
 } from "@/types/index.d.ts"
 
 const port = Deno.env.get("PORT") || 8080
-const io = new Server(Number(port), {
+
+//create  server
+const io = new Server({
   cors: {
     origin: Deno.env.get("CLIENT_DOMAIN"),
   },
 })
-console.log(`listening on port: ${port}`)
 
-const playerSocketsIDs: string[] = []
+//in-memory storage of sessions
 const sessions: session = {}
 
-io.on("connection", socket => {
-  //on connection, socket is added to playerSocketsIDs
-  playerSocketsIDs.push(socket.id)
-  console.log("sockets: ", playerSocketsIDs)
+io.on(socketEvent.connectiton, socket => {
+  console.log(`socket ${socket.id} connected`)
 
   //creates a session for socket
-  socket.on("create_session", (sessionID: string) => {
-    sessions[sessionID] = { playerSocketsIDs: [socket.id] }
-    socket.join(sessionID)
-    socket.emit("set_player", playerID.player1)
-    console.log(sessions)
-  })
+  socket.on(socketEvent.create_session, (sessionID: string) =>
+    eventCb.createSession(socket, sessions, sessionID, playerID, socketEvent)
+  )
 
   //socket joins existing session and game starts
-  socket.on("join_session", (sessionID: string) => {
-    const session = sessions[sessionID]
-    if (session) {
-      socket.join(sessionID)
-      socket.emit("sessionID_exists")
-      session.playerSocketsIDs.push(socket.id)
-      const initialGameState = game.startGame(
-        game.createSuits,
-        game.createDeck,
-        game.shuffleDeck,
-        game.dealHand,
-        game.initialPairs,
-        nonNumValue,
-        suit
-      )
-      socket.emit("set_player", playerID.player2)
-      const playerTurn = Math.ceil(Math.random() * 2)
-      io.sockets
-        .in(sessionID)
-        .emit("start", initialGameState, playerTurn, sessionID)
-    }
-    //if requested session ID does not exist
-    else socket.emit("no_sessionID")
-  })
+  socket.on(socketEvent.join_session, (sessionID: string) =>
+    eventCb.joinSession(
+      io,
+      socket,
+      sessions,
+      sessionID,
+      game,
+      playerID,
+      nonNumValue,
+      suit,
+      socketEvent
+    )
+  )
 
   //card request from one player to the other
   socket.on(
-    "player_request",
-    (player: number, card: card, sessionID: string) => {
-      const playerRequest = { player, card }
-      socket.to(sessionID).emit("player_requested", playerRequest)
-    }
+    socketEvent.player_request,
+    (playerRequestObj: playerRequest, sessionID: string) =>
+      eventCb.playerRequest(socket, sessionID, playerRequestObj, socketEvent)
   )
 
   socket.on(
-    "player_match",
+    socketEvent.player_match,
     (
+      sessionID: string,
       playerRequest: playerRequest,
       playerMatch: playerMatch,
       gameStateClient: gameState,
-      playerOutput: number,
-      sessionID: string
+      playerOutput: number
     ) => {
       try {
         const gameStateServer = gameStateRemap(
@@ -102,10 +88,10 @@ io.on("connection", socket => {
         io.sockets
           .in(sessionID)
           .emit(
-            "player_match",
+            socketEvent.player_match,
             newGameStateClient,
             playerOutput,
-            playerRequest.player
+            playerRequest.clientPlayer
           )
       } catch (error) {
         console.error(error)
@@ -114,21 +100,21 @@ io.on("connection", socket => {
   )
 
   socket.on(
-    "no_player_match",
+    socketEvent.no_player_match,
     (playerRequest: playerRequest, sessionID: string) =>
-      socket.to(sessionID).emit("player_to_deal", playerRequest)
+      socket.to(sessionID).emit(socketEvent.player_to_deal, playerRequest)
   )
 
   socket.on(
-    "player_dealt",
+    socketEvent.player_dealt,
     (
       playerRequest: playerRequest,
-      gameStateClient: gameState,
+      gameStateClient: gameStateClient,
       sessionID: string
     ) => {
       const gameStateServer = gameStateRemap(
         gameStateClient,
-        playerRequest.player
+        playerRequest.clientPlayer
       )
 
       const dealt = game.handleDealcard(
@@ -146,34 +132,41 @@ io.on("connection", socket => {
       io.sockets
         .in(sessionID)
         .emit(
-          "player_dealt",
+          socketEvent.player_dealt,
           newGameStateClient,
           playerOutput,
-          playerRequest.player
+          playerRequest.clientPlayer
         )
     }
   )
 
   socket.on(
-    "player_response_message",
+    socketEvent.player_response_message,
     (playerOutput: number, sessionID: string) =>
-      socket.to(sessionID).emit("player_response_message", playerOutput)
+      socket
+        .to(sessionID)
+        .emit(socketEvent.player_response_message, playerOutput)
   )
 
-  socket.on("player_turn_switch", (sessionID: string, playerTurn: number) =>
-    socket.to(sessionID).emit("player_turn_switch", playerTurn)
+  socket.on(
+    socketEvent.player_turn_switch,
+    (sessionID: string, playerTurn: number) =>
+      socket.to(sessionID).emit(socketEvent.player_turn_switch, playerTurn)
   )
 
   //remove socket from playerSocketsIDs and delete session
-  socket.on("disconnect", () => {
+  socket.on(socketEvent.disconnect, () => {
     for (const session in sessions)
       if (sessions[session].playerSocketsIDs.includes(socket.id)) {
-        socket.to(session).emit("player_disconnected")
+        socket.to(session).emit(socketEvent.player_disconnected)
         delete sessions[session]
       }
 
-    playerSocketsIDs.splice(playerSocketsIDs.indexOf(socket.id), 1)
-    console.log("sockets: ", playerSocketsIDs)
+    console.log(`socket ${socket.id} disconnected`)
     console.log(`sessions: ${JSON.stringify(sessions)}`)
   })
+})
+
+await serve(io.handler(), {
+  port: Number(port),
 })

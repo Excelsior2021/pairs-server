@@ -126,10 +126,10 @@ const handleplayerMatchPairs: handleplayerMatchPairs = (
 ) => {
   let player: string, opp: string
 
-  if (playerRequest.player === playerID.player1) {
+  if (playerRequest.clientPlayer === playerID.player1) {
     player = playerServer.player1
     opp = playerServer.player2
-  } else if (playerRequest.player === playerID.player2) {
+  } else if (playerRequest.clientPlayer === playerID.player2) {
     player = playerServer.player2
     opp = playerServer.player1
   } else throw new Error("clientPlayer can not be determined")
@@ -162,8 +162,9 @@ const handleDealcard: handleDealcard = (
 
   let player: string
 
-  if (playerRequest.player === playerID.player1) player = playerServer.player1
-  else if (playerRequest.player === playerID.player2)
+  if (playerRequest.clientPlayer === playerID.player1)
+    player = playerServer.player1
+  else if (playerRequest.clientPlayer === playerID.player2)
     player = playerServer.player2
   //implement error handling
   else return

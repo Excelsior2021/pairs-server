@@ -5,6 +5,7 @@ import type {
   playerServer as playerServerType,
   playerOutput as playerOutputType,
   suit as suitType,
+  playerID,
 } from "@/enums/index.ts"
 
 export type card = {
@@ -26,12 +27,12 @@ export type session = {
 }
 
 export type playerRequest = {
-  player: number
+  clientPlayer: playerIDType
   card: card
 }
 
 export type playerMatch = {
-  clientPlayer: number
+  clientPlayer: playerIDType
   card: card
 }
 
@@ -100,3 +101,20 @@ export type handleDealcard = (
   playerID: typeof playerIDType,
   playerServer: typeof playerServerType
 ) => { gameState: gameState; playerOutput: playerOutputType } | undefined
+
+export type game = {
+  createSuits: createSuits
+  createDeck: createDeck
+  shuffleDeck: shuffleDeck
+  dealcard: dealcard
+  dealHand: dealHand
+  initialPairs: initialPairs
+  startGame: startGame
+  handleplayerMatchPairs: handleplayerMatchPairs
+  handleDealcard: handleDealcard
+}
+
+type gameStateRemap = (
+  gameState: gameStateClient,
+  clientPlayer: playerID
+) => gameState
