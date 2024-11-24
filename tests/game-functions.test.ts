@@ -132,7 +132,7 @@ describe("gameFunctions", () => {
     })
   })
 
-  describe("handleplayerMatchPairs()", () => {
+  describe("handlePlayerMatchPairs()", () => {
     const initialGameState = {
       player1: {
         hand: [
@@ -152,7 +152,7 @@ describe("gameFunctions", () => {
       deck: [],
     } as any
     const playerRequest = {
-      player: 1,
+      clientPlayer: 1,
       card: {
         id: 1,
       },
@@ -165,7 +165,7 @@ describe("gameFunctions", () => {
 
     it("returns transformed game state after player match", () => {
       expect(
-        game.handleplayerMatchPairs(
+        game.handlePlayerMatchPairs(
           playerRequest,
           playerMatch,
           initialGameState,
@@ -215,7 +215,7 @@ describe("gameFunctions", () => {
     })
 
     const playerRequest = {
-      player: 1,
+      clientPlayer: 1,
       card: {
         id: 1,
         value: 1,

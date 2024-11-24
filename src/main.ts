@@ -1,5 +1,4 @@
 import { Server } from "socket.io"
-import { serve } from "https://deno.land/std@0.150.0/http/server.ts"
 import eventCb from "@/event-cb/index.ts"
 import game from "@/game-functions/index.ts"
 import { gameStateRemap } from "@/utils/index.ts"
@@ -10,27 +9,28 @@ import {
   playerID,
   playerServer,
   socketEvent,
+  playerOutput,
 } from "@/enums/index.ts"
 import "@std/dotenv/load"
 import type {
   playerRequest,
-  gameState,
   playerMatch,
-  session,
+  sessions,
   gameStateClient,
 } from "@/types/index.d.ts"
 
 const port = Deno.env.get("PORT") || 8080
 
 //create  server
-const io = new Server({
+const io = new Server(Number(port), {
   cors: {
     origin: Deno.env.get("CLIENT_DOMAIN"),
   },
 })
+console.log(`listening on port: ${port}`)
 
 //in-memory storage of sessions
-const sessions: session = {}
+const sessions: sessions = {}
 
 io.on(socketEvent.connectiton, socket => {
   console.log(`socket ${socket.id} connected`)
@@ -55,118 +55,86 @@ io.on(socketEvent.connectiton, socket => {
     )
   )
 
-  //card request from one player to the other
+  //card request from player to opponent
   socket.on(
     socketEvent.player_request,
-    (playerRequestObj: playerRequest, sessionID: string) =>
-      eventCb.playerRequest(socket, sessionID, playerRequestObj, socketEvent)
+    (playerRequest: playerRequest, sessionID: string) =>
+      eventCb.playerRequest(socket, sessionID, playerRequest, socketEvent)
   )
 
+  //player has a match with opponent
   socket.on(
     socketEvent.player_match,
     (
-      sessionID: string,
       playerRequest: playerRequest,
       playerMatch: playerMatch,
-      gameStateClient: gameState,
-      playerOutput: number
-    ) => {
-      try {
-        const gameStateServer = gameStateRemap(
-          gameStateClient,
-          playerMatch.clientPlayer
-        )
-
-        const newGameStateClient = game.handleplayerMatchPairs(
-          playerRequest,
-          playerMatch,
-          gameStateServer,
-          playerID,
-          playerServer
-        )
-
-        io.sockets
-          .in(sessionID)
-          .emit(
-            socketEvent.player_match,
-            newGameStateClient,
-            playerOutput,
-            playerRequest.clientPlayer
-          )
-      } catch (error) {
-        console.error(error)
-      }
-    }
+      gameStateClient: gameStateClient,
+      playerOutput: number,
+      sessionID: string
+    ) =>
+      eventCb.playerMatch(
+        io,
+        gameStateRemap,
+        sessionID,
+        game,
+        playerRequest,
+        playerMatch,
+        gameStateClient,
+        playerOutput,
+        playerID,
+        playerServer,
+        socketEvent
+      )
   )
 
+  //player does not have a match with opponent
   socket.on(
     socketEvent.no_player_match,
     (playerRequest: playerRequest, sessionID: string) =>
-      socket.to(sessionID).emit(socketEvent.player_to_deal, playerRequest)
+      eventCb.noPlayerMatch(socket, sessionID, playerRequest, socketEvent)
   )
 
+  //player deals card from the deck
   socket.on(
     socketEvent.player_dealt,
     (
       playerRequest: playerRequest,
       gameStateClient: gameStateClient,
       sessionID: string
-    ) => {
-      const gameStateServer = gameStateRemap(
+    ) =>
+      eventCb.playerDealt(
+        io,
+        sessionID,
+        gameStateRemap,
         gameStateClient,
-        playerRequest.clientPlayer
-      )
-
-      const dealt = game.handleDealcard(
+        game,
         playerRequest,
-        gameStateServer,
-        game.dealcard,
         playerOutputEnum,
         playerID,
-        playerServer
+        playerServer,
+        socketEvent
       )
-
-      const newGameStateClient = dealt?.gameState
-      const playerOutput = dealt?.playerOutput
-
-      io.sockets
-        .in(sessionID)
-        .emit(
-          socketEvent.player_dealt,
-          newGameStateClient,
-          playerOutput,
-          playerRequest.clientPlayer
-        )
-    }
   )
 
   socket.on(
     socketEvent.player_response_message,
-    (playerOutput: number, sessionID: string) =>
-      socket
-        .to(sessionID)
-        .emit(socketEvent.player_response_message, playerOutput)
+    (playerOutput: playerOutput, sessionID: string) =>
+      eventCb.playerResponseMessage(
+        socket,
+        sessionID,
+        playerOutput,
+        socketEvent
+      )
   )
 
   socket.on(
     socketEvent.player_turn_switch,
-    (sessionID: string, playerTurn: number) =>
-      socket.to(sessionID).emit(socketEvent.player_turn_switch, playerTurn)
+    (sessionID: string, playerTurn: playerID) =>
+      eventCb.playerTurnSwitch(socket, sessionID, playerTurn, socketEvent)
   )
 
   //remove socket from playerSocketsIDs and delete session
-  socket.on(socketEvent.disconnect, () => {
-    for (const session in sessions)
-      if (sessions[session].playerSocketsIDs.includes(socket.id)) {
-        socket.to(session).emit(socketEvent.player_disconnected)
-        delete sessions[session]
-      }
-
-    console.log(`socket ${socket.id} disconnected`)
-    console.log(`sessions: ${JSON.stringify(sessions)}`)
-  })
-})
-
-await serve(io.handler(), {
-  port: Number(port),
+  socket.on(socketEvent.disconnect, () =>
+    eventCb.disconnect(socket, sessions, socketEvent)
+  )
 })

@@ -7,7 +7,7 @@ import type {
   shuffleDeck,
   startGame,
   createSuits,
-  handleplayerMatchPairs,
+  handlePlayerMatchPairs,
   handleDealcard,
 } from "@/types/index.d.ts"
 
@@ -117,7 +117,7 @@ const startGame: startGame = (
   }
 }
 
-const handleplayerMatchPairs: handleplayerMatchPairs = (
+const handlePlayerMatchPairs: handlePlayerMatchPairs = (
   playerRequest,
   playerMatch,
   gameState,
@@ -209,6 +209,6 @@ export default {
   dealHand,
   initialPairs,
   startGame,
-  handleplayerMatchPairs,
+  handlePlayerMatchPairs,
   handleDealcard,
 }

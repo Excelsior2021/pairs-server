@@ -7,6 +7,7 @@
     "jsr:@std/expect@*": "1.0.5",
     "jsr:@std/internal@^1.0.4": "1.0.4",
     "jsr:@std/testing@*": "1.0.3",
+    "npm:@types/node@*": "22.5.4",
     "npm:socket.io@*": "4.8.1"
   },
   "jsr": {

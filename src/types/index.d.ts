@@ -20,7 +20,7 @@ export type player = {
   pairs: card[]
 }
 
-export type session = {
+export type sessions = {
   [sessionID: string]: {
     playerSocketsIDs: string[]
   }
@@ -85,7 +85,7 @@ export type startGame = (
   player2: player
 }
 
-export type handleplayerMatchPairs = (
+export type handlePlayerMatchPairs = (
   playerRequest: playerRequest,
   playerMatch: playerMatch,
   gameState: gameState,
@@ -110,7 +110,7 @@ export type game = {
   dealHand: dealHand
   initialPairs: initialPairs
   startGame: startGame
-  handleplayerMatchPairs: handleplayerMatchPairs
+  handlePlayerMatchPairs: handlePlayerMatchPairs
   handleDealcard: handleDealcard
 }
 

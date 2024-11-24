@@ -1,8 +1,13 @@
 import type {
   createSession,
+  disconnect,
   joinSession,
+  noPlayerMatch,
+  playerDealt,
   playerMatch,
   playerRequest,
+  playerResponseMessage,
+  playerTurnSwitch,
 } from "@/types/event-cb.d.ts"
 
 const createSession: createSession = (
@@ -57,16 +62,16 @@ const joinSession: joinSession = (
 const playerRequest: playerRequest = (
   socket,
   sessionID,
-  playerRequestObj,
+  playerRequest,
   socketEvent
-) => socket.to(sessionID).emit(socketEvent.player_requested, playerRequestObj)
+) => socket.to(sessionID).emit(socketEvent.player_requested, playerRequest)
 
 const playerMatch: playerMatch = (
   io,
   gameStateRemap,
   sessionID,
   game,
-  playerRequestObj,
+  playerRequest,
   playerMatch,
   gameStateClient,
   playerOutput,
@@ -80,8 +85,8 @@ const playerMatch: playerMatch = (
       playerMatch.clientPlayer
     )
 
-    const newGameStateClient = game.handleplayerMatchPairs(
-      playerRequestObj,
+    const newGameStateClient = game.handlePlayerMatchPairs(
+      playerRequest,
       playerMatch,
       gameStateServer,
       playerID,
@@ -94,11 +99,83 @@ const playerMatch: playerMatch = (
         socketEvent.player_match,
         newGameStateClient,
         playerOutput,
-        playerRequestObj.clientPlayer
+        playerRequest.clientPlayer
       )
   } catch (error) {
     console.error(error)
   }
+}
+
+const noPlayerMatch: noPlayerMatch = (
+  socket,
+  sessionID,
+  playerRequest,
+  socketEvent
+) => socket.to(sessionID).emit(socketEvent.player_to_deal, playerRequest)
+
+const playerDealt: playerDealt = (
+  io,
+  sessionID,
+  gameStateRemap,
+  gameStateClient,
+  game,
+  playerRequest,
+  playerOutputEnum,
+  playerID,
+  playerServer,
+  socketEvent
+) => {
+  const gameStateServer = gameStateRemap(
+    gameStateClient,
+    playerRequest.clientPlayer
+  )
+
+  const dealt = game.handleDealcard(
+    playerRequest,
+    gameStateServer,
+    game.dealcard,
+    playerOutputEnum,
+    playerID,
+    playerServer
+  )
+
+  const newGameStateClient = dealt?.gameState
+  const playerOutput = dealt?.playerOutput
+
+  io.sockets
+    .in(sessionID)
+    .emit(
+      socketEvent.player_dealt,
+      newGameStateClient,
+      playerOutput,
+      playerRequest.clientPlayer
+    )
+}
+
+const playerResponseMessage: playerResponseMessage = (
+  socket,
+  sessionID,
+  playerOutput,
+  socketEvent
+) =>
+  socket.to(sessionID).emit(socketEvent.player_response_message, playerOutput)
+
+const playerTurnSwitch: playerTurnSwitch = (
+  socket,
+  sessionID,
+  playerTurn,
+  socketEvent
+) => socket.to(sessionID).emit(socketEvent.player_turn_switch, playerTurn)
+
+const disconnect: disconnect = (socket, sessions, socketEvent) => {
+  for (const session in sessions)
+    if (sessions[session].playerSocketsIDs.includes(socket.id)) {
+      socket.to(session).emit(socketEvent.player_disconnected)
+      delete sessions[session]
+    }
+
+  console.log(`socket ${socket.id} disconnected`)
+  console.log(`sessions: ${JSON.stringify(sessions)}`)
 }
 
 export default {
@@ -106,4 +183,9 @@ export default {
   joinSession,
   playerRequest,
   playerMatch,
+  noPlayerMatch,
+  playerDealt,
+  playerResponseMessage,
+  playerTurnSwitch,
+  disconnect,
 }

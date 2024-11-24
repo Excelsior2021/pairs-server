@@ -2,78 +2,31 @@
 import { expect } from "jsr:@std/expect"
 import { describe, it } from "jsr:@std/testing/bdd"
 import { gameStateRemap } from "@/utils/index.ts"
-import type { card, player, gameState } from "@/types/index.d.ts"
+import type {
+  card,
+  player,
+  gameState,
+  gameStateClient,
+} from "@/types/index.d.ts"
 
 describe("utils", () => {
   const player: player = {
-    hand: [
-      {
-        id: "4_of_clubs",
-        value: 4,
-        suit: "clubs",
-        img: "",
-      },
-      {
-        id: "6_of_clubs",
-        value: 6,
-        suit: "clubs",
-        img: "",
-      },
-    ],
-    pairs: [
-      {
-        id: "2_of_clubs",
-        value: 2,
-        suit: "clubs",
-        img: "",
-      },
-      {
-        id: "2_of_spades",
-        value: 2,
-        suit: "spades",
-        img: "",
-      },
-    ],
+    hand: [],
+    pairs: [],
   }
   const opponent: player = {
-    hand: [
-      {
-        id: "8_of_clubs",
-        value: 8,
-        suit: "clubs",
-        img: "",
-      },
-      {
-        id: "10_of_clubs",
-        value: 10,
-        suit: "clubs",
-        img: "",
-      },
-    ],
-    pairs: [
-      {
-        id: "3_of_clubs",
-        value: 3,
-        suit: "clubs",
-        img: "",
-      },
-      {
-        id: "3_of_spades",
-        value: 3,
-        suit: "spades",
-        img: "",
-      },
-    ],
+    hand: [],
+    pairs: [],
   }
   const shuffledDeck: card[] = []
 
-  const initialGameState: gameState = {
+  const initialGameState: gameStateClient = {
     player,
     opponent,
     shuffledDeck,
   }
 
-  const gameStateRemapped: gameState = {
+  const remappedGameState: gameState = {
     player1: player,
     player2: opponent,
     shuffledDeck,
@@ -83,7 +36,7 @@ describe("utils", () => {
     const clientPlayer = 1
     it("returns remmapped game state", () => {
       expect(gameStateRemap(initialGameState, clientPlayer)).toStrictEqual(
-        gameStateRemapped
+        remappedGameState
       )
     })
   })
