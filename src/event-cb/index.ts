@@ -30,8 +30,6 @@ const joinSession: joinSession = (
   sessionID,
   game,
   playerID,
-  nonNumValue,
-  suit,
   socketEvent
 ) => {
   const session = sessions[sessionID]
@@ -40,13 +38,9 @@ const joinSession: joinSession = (
     socket.emit(socketEvent.sessionID_exists)
     session.playerSocketsIDs.push(socket.id)
     const initialGameState = game.startGame(
-      game.createSuits,
-      game.createDeck,
       game.shuffleDeck,
       game.dealHand,
-      game.initialPairs,
-      nonNumValue,
-      suit
+      game.initialPairs
     )
     socket.emit(socketEvent.set_player, playerID.player2)
     const playerTurn = Math.ceil(Math.random() * 2)
@@ -56,7 +50,7 @@ const joinSession: joinSession = (
   }
   //if requested session ID does not exist
   else socket.emit(socketEvent.no_sessionID)
-  console.log(sessions)
+  console.log(`sessions: ${JSON.stringify(sessions)}`)
 }
 
 const playerRequest: playerRequest = (

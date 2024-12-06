@@ -3,42 +3,15 @@ import { expect } from "jsr:@std/expect"
 import { describe, it, test, beforeEach } from "jsr:@std/testing/bdd"
 import { spy } from "jsr:@std/testing/mock"
 import game from "@/game-functions/index.ts"
-import {
-  nonNumValue,
-  suit,
-  playerOutput,
-  playerID,
-  playerServer,
-} from "@/enums/index.ts"
+import { playerOutput, playerID, playerServer } from "@/enums/index.ts"
 import mockDeck from "./__mocks__/deck.ts"
 import type { card, gameState, playerRequest } from "@/types/index.d.ts"
 
 describe("gameFunctions", () => {
   let deck: card[]
-  const createSuitsSpy = spy(game.createSuits)
 
   beforeEach(() => {
-    deck = game.createDeck(createSuitsSpy, nonNumValue, suit)
-  })
-
-  describe("createSuits()", () => {
-    const deck: card[] = []
-    const value = nonNumValue.ace
-    let deckIndex = 0
-    const suits = [suit.clubs, suit.diamonds, suit.hearts, suit.spades]
-
-    deckIndex = game.createSuits(value, deck, deckIndex, suits)
-
-    expect(deckIndex).toBe(4)
-    expect(JSON.stringify(deck)).toStrictEqual(
-      JSON.stringify(mockDeck.slice(0, 4))
-    )
-  })
-
-  describe("createDeck()", () => {
-    it("returns a standard deck of cards", () => {
-      expect(JSON.stringify(deck)).toStrictEqual(JSON.stringify(mockDeck))
-    })
+    deck = structuredClone(mockDeck)
   })
 
   describe("dealcard()", () => {
@@ -113,18 +86,13 @@ describe("gameFunctions", () => {
       pairs = hand
     const player1 = { hand, pairs }
     const player2 = { hand, pairs }
-    const createDeckSpy = spy(game.createDeck)
     const shuffleDeckStub = spy(() => shuffledDeck)
     const dealHandStub = spy(() => hand)
     const initialPairsStub = spy(() => pairs)
     const startGame = game.startGame(
-      createSuitsSpy,
-      createDeckSpy,
       shuffleDeckStub,
       dealHandStub,
-      initialPairsStub,
-      nonNumValue,
-      suit
+      initialPairsStub
     )
 
     it("returns start game data", () => {

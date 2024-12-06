@@ -1,50 +1,14 @@
 import type {
   card,
-  createDeck,
   dealcard,
   dealHand,
   initialPairs,
   shuffleDeck,
   startGame,
-  createSuits,
   handlePlayerMatchPairs,
   handleDealcard,
 } from "@/types/index.d.ts"
-
-const createSuits: createSuits = (value, deck, deckIndex, suits) => {
-  for (const suit of suits) {
-    const id = `${value}_of_${suit}`
-    const card = {
-      id,
-      value,
-      suit,
-      img: `./cards/${id}.webp`,
-    }
-    deck[deckIndex] = card
-    deckIndex++
-  }
-  return deckIndex
-}
-
-const createDeck: createDeck = (createSuits, nonNumValue, suit) => {
-  const deck: card[] = new Array(52)
-  const non_num_cards = [
-    nonNumValue.ace,
-    nonNumValue.jack,
-    nonNumValue.queen,
-    nonNumValue.king,
-  ]
-  const suits = [suit.clubs, suit.diamonds, suit.hearts, suit.spades]
-  let deckIndex = 0
-
-  for (const value of non_num_cards)
-    deckIndex = createSuits(value, deck, deckIndex, suits)
-
-  for (let value = 2; value < 11; value++)
-    deckIndex = createSuits(value, deck, deckIndex, suits)
-
-  return deck
-}
+import deckObj from "@/deck/index.ts"
 
 const shuffleDeck: shuffleDeck = deck => {
   for (const x in deck) {
@@ -88,16 +52,8 @@ const initialPairs: initialPairs = hand => {
   return pairs
 }
 
-const startGame: startGame = (
-  createSuits,
-  createDeck,
-  shuffleDeck,
-  dealHand,
-  initialPairs,
-  nonNumValue,
-  suit
-) => {
-  const deck = createDeck(createSuits, nonNumValue, suit)
+const startGame: startGame = (shuffleDeck, dealHand, initialPairs) => {
+  const deck = structuredClone(deckObj)
   const shuffledDeck = shuffleDeck(deck)
   const initialHandSize: number = 7
 
@@ -202,8 +158,6 @@ const handleDealcard: handleDealcard = (
 }
 
 export default {
-  createSuits,
-  createDeck,
   shuffleDeck,
   dealcard,
   dealHand,

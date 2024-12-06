@@ -1,11 +1,9 @@
 import type { Server, Socket } from "socket.io"
 import type {
-  nonNumValue as nonNumValueType,
   playerID as playerIDType,
   playerOutput,
   playerServer as playerServerType,
   socketEvent as socketEventType,
-  suit as suitType,
 } from "@/enums/index.ts"
 import type {
   game,
@@ -31,8 +29,6 @@ type joinSession = (
   sessionID: string,
   game: game,
   playerID: typeof playerIDType,
-  nonNumValue: typeof nonNumValueType,
-  suit: typeof suitType,
   socketEvent: typeof socketEventType
 ) => void
 

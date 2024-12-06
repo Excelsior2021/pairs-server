@@ -3,8 +3,6 @@ import eventCb from "@/event-cb/index.ts"
 import game from "@/game-functions/index.ts"
 import { gameStateRemap } from "@/utils/index.ts"
 import {
-  nonNumValue,
-  suit,
   playerOutput as playerOutputEnum,
   playerID,
   playerServer,
@@ -49,8 +47,6 @@ io.on(socketEvent.connectiton, socket => {
       sessionID,
       game,
       playerID,
-      nonNumValue,
-      suit,
       socketEvent
     )
   )

@@ -1,6 +1,5 @@
 import type {
   nonNumValue,
-  nonNumValue as nonNumValueType,
   playerID as playerIDType,
   playerServer as playerServerType,
   playerOutput as playerOutputType,
@@ -50,19 +49,6 @@ export type gameState = gameStateplayers & {
   shuffledDeck: card[]
 }
 
-export type createSuits = (
-  value: number | nonNumValueType,
-  deck: card[],
-  deckIndex: number,
-  suits: suitType[]
-) => number
-
-export type createDeck = (
-  createSuits: createSuits,
-  nonNumValue: typeof nonNumValueType,
-  suit: typeof suitType
-) => card[]
-
 export type shuffleDeck = (deck: card[]) => card[]
 
 export type dealcard = (deck: card[]) => card | undefined
@@ -72,13 +58,9 @@ export type dealHand = (deck: card[], handSize: number) => card[]
 export type initialPairs = (hand: card[]) => card[]
 
 export type startGame = (
-  createSuits: createSuits,
-  createDeck: createDeck,
   shuffleDeck: shuffleDeck,
   dealHand: dealHand,
-  initialPairs: initialPairs,
-  nonNumValue: typeof nonNumValueType,
-  suit: typeof suitType
+  initialPairs: initialPairs
 ) => {
   shuffledDeck: card[]
   player1: player
@@ -103,8 +85,6 @@ export type handleDealcard = (
 ) => { gameState: gameState; playerOutput: playerOutputType } | undefined
 
 export type game = {
-  createSuits: createSuits
-  createDeck: createDeck
   shuffleDeck: shuffleDeck
   dealcard: dealcard
   dealHand: dealHand
