@@ -41,7 +41,6 @@ const joinSession: joinSession = (
     const initialGameState = game.startGame(
       deck,
       game.shuffleDeck,
-      game.dealHand,
       game.initialPairs
     )
     socket.emit(socketEvent.set_player, playerID.player2)

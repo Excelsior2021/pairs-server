@@ -1,6 +1,5 @@
 import type {
   card,
-  dealHand,
   initialPairs,
   shuffleDeck,
   startGame,
@@ -16,11 +15,6 @@ const shuffleDeck: shuffleDeck = deck => {
     deck[y] = temp
   }
   return deck
-}
-
-const dealHand: dealHand = (deck, handSize) => {
-  const hand = deck.splice(0, handSize)
-  return hand
 }
 
 const initialPairs: initialPairs = hand => {
@@ -45,12 +39,12 @@ const initialPairs: initialPairs = hand => {
   return pairs
 }
 
-const startGame: startGame = (deck, shuffleDeck, dealHand, initialPairs) => {
+const startGame: startGame = (deck, shuffleDeck, initialPairs) => {
   const shuffledDeck = shuffleDeck(deck)
   const initialHandSize: number = 7
 
-  const player1Hand = dealHand(shuffledDeck, initialHandSize)
-  const player2Hand = dealHand(shuffledDeck, initialHandSize)
+  const player1Hand = shuffledDeck.splice(0, initialHandSize)
+  const player2Hand = shuffledDeck.splice(0, initialHandSize)
 
   const player1Pairs = initialPairs(player1Hand)
   const player2Pairs = initialPairs(player2Hand)
@@ -125,7 +119,6 @@ const handleDealCard: handleDealCard = (
 
 export default {
   shuffleDeck,
-  dealHand,
   initialPairs,
   startGame,
   handlePlayerMatchPairs,
