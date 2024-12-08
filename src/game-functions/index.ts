@@ -1,12 +1,11 @@
 import type {
   card,
-  dealcard,
   dealHand,
   initialPairs,
   shuffleDeck,
   startGame,
   handlePlayerMatchPairs,
-  handleDealcard,
+  handleDealCard,
 } from "@/types/index.d.ts"
 
 const shuffleDeck: shuffleDeck = deck => {
@@ -17,11 +16,6 @@ const shuffleDeck: shuffleDeck = deck => {
     deck[y] = temp
   }
   return deck
-}
-
-const dealcard: dealcard = (deck: card[]) => {
-  if (deck.length === 0) return //handle
-  return deck.pop()
 }
 
 const dealHand: dealHand = (deck, handSize) => {
@@ -89,16 +83,13 @@ const handlePlayerMatchPairs: handlePlayerMatchPairs = (
   return gameState
 }
 
-const handleDealcard: handleDealcard = (
+const handleDealCard: handleDealCard = (
   playerRequest,
   gameState,
-  dealcard,
   playerOutput
 ) => {
-  // if (gameState.shuffledDeck.length === 0) return
-
   const playerRequestcard = playerRequest.card
-  const dealtcard = dealcard(gameState.shuffledDeck)!
+  const dealtcard = gameState.shuffledDeck.pop()!
 
   if (playerRequestcard.value === dealtcard.value) {
     gameState.player.pairs.push(dealtcard, playerRequestcard)
@@ -134,10 +125,9 @@ const handleDealcard: handleDealcard = (
 
 export default {
   shuffleDeck,
-  dealcard,
   dealHand,
   initialPairs,
   startGame,
   handlePlayerMatchPairs,
-  handleDealcard,
+  handleDealCard,
 }

@@ -48,8 +48,6 @@ export type gameStateServer = {
 
 export type shuffleDeck = (deck: card[]) => card[]
 
-export type dealcard = (deck: card[]) => card | undefined
-
 export type dealHand = (deck: card[], handSize: number) => card[]
 
 export type initialPairs = (hand: card[]) => card[]
@@ -71,21 +69,19 @@ export type handlePlayerMatchPairs = (
   gameState: gameStateClient
 ) => gameStateClient
 
-export type handleDealcard = (
+export type handleDealCard = (
   playerRequest: playerRequest,
   gameState: gameStateClient,
-  dealcard: dealcard,
   playerOutput: typeof playerOutputType
 ) => { newGameStateClient: gameStateClient; playerOutput: playerOutputType }
 
 export type game = {
   shuffleDeck: shuffleDeck
-  dealcard: dealcard
   dealHand: dealHand
   initialPairs: initialPairs
   startGame: startGame
   handlePlayerMatchPairs: handlePlayerMatchPairs
-  handleDealcard: handleDealcard
+  handleDealCard: handleDealCard
 }
 
 type gameStateRemap = (

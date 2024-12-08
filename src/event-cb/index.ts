@@ -115,10 +115,9 @@ const playerDealt: playerDealt = (
   playerOutputEnum,
   socketEvent
 ) => {
-  const { newGameStateClient, playerOutput } = game.handleDealcard(
+  const { newGameStateClient, playerOutput } = game.handleDealCard(
     playerRequest,
     gameStateClient,
-    game.dealcard,
     playerOutputEnum
   )
 

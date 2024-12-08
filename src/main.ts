@@ -1,5 +1,6 @@
 import { Server } from "socket.io"
 import eventCb from "@/event-cb/index.ts"
+import deck from "@/deck/index.ts"
 import game from "@/game-functions/index.ts"
 import { gameStateRemap } from "@/utils/index.ts"
 import {
@@ -15,7 +16,6 @@ import type {
   sessions,
   gameStateClient,
 } from "@/types/index.d.ts"
-import deck from "@/deck/index.ts"
 
 const port = Deno.env.get("PORT") || 8080
 
