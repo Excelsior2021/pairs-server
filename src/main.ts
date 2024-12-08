@@ -5,7 +5,6 @@ import { gameStateRemap } from "@/utils/index.ts"
 import {
   playerOutput as playerOutputEnum,
   playerID,
-  playerServer,
   socketEvent,
   playerOutput,
 } from "@/enums/index.ts"
@@ -16,6 +15,7 @@ import type {
   sessions,
   gameStateClient,
 } from "@/types/index.d.ts"
+import deck from "@/deck/index.ts"
 
 const port = Deno.env.get("PORT") || 8080
 
@@ -45,6 +45,7 @@ io.on(socketEvent.connectiton, socket => {
       socket,
       sessions,
       sessionID,
+      deck,
       game,
       playerID,
       socketEvent
@@ -77,8 +78,6 @@ io.on(socketEvent.connectiton, socket => {
         playerMatch,
         gameStateClient,
         playerOutput,
-        playerID,
-        playerServer,
         socketEvent
       )
   )
@@ -106,8 +105,6 @@ io.on(socketEvent.connectiton, socket => {
         game,
         playerRequest,
         playerOutputEnum,
-        playerID,
-        playerServer,
         socketEvent
       )
   )

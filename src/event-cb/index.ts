@@ -28,6 +28,7 @@ const joinSession: joinSession = (
   socket,
   sessions,
   sessionID,
+  deck,
   game,
   playerID,
   socketEvent
@@ -38,6 +39,7 @@ const joinSession: joinSession = (
     socket.emit(socketEvent.sessionID_exists)
     session.playerSocketsIDs.push(socket.id)
     const initialGameState = game.startGame(
+      deck,
       game.shuffleDeck,
       game.dealHand,
       game.initialPairs
@@ -69,29 +71,25 @@ const playerMatch: playerMatch = (
   playerMatch,
   gameStateClient,
   playerOutput,
-  playerID,
-  playerServer,
   socketEvent
 ) => {
   try {
-    const gameStateServer = gameStateRemap(
-      gameStateClient,
-      playerMatch.clientPlayer
-    )
-
     const newGameStateClient = game.handlePlayerMatchPairs(
       playerRequest,
       playerMatch,
-      gameStateServer,
-      playerID,
-      playerServer
+      gameStateClient
+    )
+
+    const gameStateServer = gameStateRemap(
+      newGameStateClient,
+      playerMatch.clientPlayer
     )
 
     io.sockets
       .in(sessionID)
       .emit(
         socketEvent.player_match,
-        newGameStateClient,
+        gameStateServer,
         playerOutput,
         playerRequest.clientPlayer
       )
@@ -115,32 +113,25 @@ const playerDealt: playerDealt = (
   game,
   playerRequest,
   playerOutputEnum,
-  playerID,
-  playerServer,
   socketEvent
 ) => {
-  const gameStateServer = gameStateRemap(
+  const { newGameStateClient, playerOutput } = game.handleDealcard(
+    playerRequest,
     gameStateClient,
+    game.dealcard,
+    playerOutputEnum
+  )
+
+  const gameStateServer = gameStateRemap(
+    newGameStateClient,
     playerRequest.clientPlayer
   )
-
-  const dealt = game.handleDealcard(
-    playerRequest,
-    gameStateServer,
-    game.dealcard,
-    playerOutputEnum,
-    playerID,
-    playerServer
-  )
-
-  const newGameStateClient = dealt?.gameState
-  const playerOutput = dealt?.playerOutput
 
   io.sockets
     .in(sessionID)
     .emit(
       socketEvent.player_dealt,
-      newGameStateClient,
+      gameStateServer,
       playerOutput,
       playerRequest.clientPlayer
     )

@@ -1,6 +1,6 @@
 import type { card } from "@/types/index.d.ts"
 
-export default [
+export default structuredClone([
   {
     id: "ace_of_clubs",
     value: "ace",
@@ -313,4 +313,4 @@ export default [
     suit: "spades",
     img: "./cards/10_of_spades.webp",
   },
-] as card[]
+]) as card[]

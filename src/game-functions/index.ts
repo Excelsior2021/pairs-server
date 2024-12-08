@@ -8,7 +8,6 @@ import type {
   handlePlayerMatchPairs,
   handleDealcard,
 } from "@/types/index.d.ts"
-import deckObj from "@/deck/index.ts"
 
 const shuffleDeck: shuffleDeck = deck => {
   for (const x in deck) {
@@ -52,8 +51,7 @@ const initialPairs: initialPairs = hand => {
   return pairs
 }
 
-const startGame: startGame = (shuffleDeck, dealHand, initialPairs) => {
-  const deck = structuredClone(deckObj)
+const startGame: startGame = (deck, shuffleDeck, dealHand, initialPairs) => {
   const shuffledDeck = shuffleDeck(deck)
   const initialHandSize: number = 7
 
@@ -76,27 +74,15 @@ const startGame: startGame = (shuffleDeck, dealHand, initialPairs) => {
 const handlePlayerMatchPairs: handlePlayerMatchPairs = (
   playerRequest,
   playerMatch,
-  gameState,
-  playerID,
-  playerServer
+  gameState
 ) => {
-  let player: string, opp: string
+  gameState.opponent.pairs.push(playerRequest.card, playerMatch.card)
 
-  if (playerRequest.clientPlayer === playerID.player1) {
-    player = playerServer.player1
-    opp = playerServer.player2
-  } else if (playerRequest.clientPlayer === playerID.player2) {
-    player = playerServer.player2
-    opp = playerServer.player1
-  } else throw new Error("clientPlayer can not be determined")
-
-  gameState[player].pairs.push(playerRequest.card, playerMatch.card)
-
-  gameState[player].hand = gameState[player].hand.filter(
+  gameState.opponent.hand = gameState.opponent.hand.filter(
     (card: card) => card.id !== playerRequest.card.id
   )
 
-  gameState[opp].hand = gameState[opp].hand.filter(
+  gameState.player.hand = gameState.player.hand.filter(
     (card: card) => card.id !== playerMatch.card.id
   )
 
@@ -107,52 +93,41 @@ const handleDealcard: handleDealcard = (
   playerRequest,
   gameState,
   dealcard,
-  playerOutput,
-  playerID,
-  playerServer
+  playerOutput
 ) => {
-  if (gameState.shuffledDeck.length === 0) return
+  // if (gameState.shuffledDeck.length === 0) return
 
   const playerRequestcard = playerRequest.card
   const dealtcard = dealcard(gameState.shuffledDeck)!
 
-  let player: string
-
-  if (playerRequest.clientPlayer === playerID.player1)
-    player = playerServer.player1
-  else if (playerRequest.clientPlayer === playerID.player2)
-    player = playerServer.player2
-  //implement error handling
-  else return
-
   if (playerRequestcard.value === dealtcard.value) {
-    gameState[player].pairs.push(dealtcard, playerRequestcard)
-    gameState[player].hand = gameState[player].hand.filter(
+    gameState.player.pairs.push(dealtcard, playerRequestcard)
+    gameState.player.hand = gameState.player.hand.filter(
       (card: card) => card.id !== playerRequestcard.id
     )
     return {
-      gameState,
+      newGameStateClient: gameState,
       playerOutput: playerOutput.DealtcardMatch,
     }
   }
 
-  for (const card of gameState[player].hand) {
+  for (const card of gameState.player.hand) {
     if (dealtcard.value === card.value) {
-      gameState[player].pairs.push(dealtcard, card)
-      gameState[player].hand = gameState[player].hand.filter(
+      gameState.player.pairs.push(dealtcard, card)
+      gameState.player.hand = gameState.player.hand.filter(
         (cardInHand: card) => cardInHand.id !== card.id
       )
       return {
-        gameState,
+        newGameStateClient: gameState,
         playerOutput: playerOutput.HandMatch,
       }
     }
   }
 
-  gameState[player].hand.push(dealtcard)
+  gameState.player.hand.push(dealtcard)
 
   return {
-    gameState,
+    newGameStateClient: gameState,
     playerOutput: playerOutput.NoMatch,
   }
 }

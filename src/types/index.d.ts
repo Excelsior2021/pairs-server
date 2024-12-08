@@ -1,7 +1,6 @@
 import type {
   nonNumValue,
   playerID as playerIDType,
-  playerServer as playerServerType,
   playerOutput as playerOutputType,
   suit as suitType,
   playerID,
@@ -35,17 +34,15 @@ export type playerMatch = {
   card: card
 }
 
-type gameStateplayers = {
-  [player: string]: player
-}
-
 type gameStateClient = {
   player: player
   opponent: player
   shuffledDeck: card[]
 }
 
-export type gameState = gameStateplayers & {
+export type gameStateServer = {
+  player1: player
+  player2: player
   shuffledDeck: card[]
 }
 
@@ -58,6 +55,7 @@ export type dealHand = (deck: card[], handSize: number) => card[]
 export type initialPairs = (hand: card[]) => card[]
 
 export type startGame = (
+  deck: card[],
   shuffleDeck: shuffleDeck,
   dealHand: dealHand,
   initialPairs: initialPairs
@@ -70,19 +68,15 @@ export type startGame = (
 export type handlePlayerMatchPairs = (
   playerRequest: playerRequest,
   playerMatch: playerMatch,
-  gameState: gameState,
-  playerID: typeof playerIDType,
-  playerServer: typeof playerServerType
-) => gameState | undefined
+  gameState: gameStateClient
+) => gameStateClient
 
 export type handleDealcard = (
   playerRequest: playerRequest,
-  gameState: gameState,
+  gameState: gameStateClient,
   dealcard: dealcard,
-  playerOutput: typeof playerOutputType,
-  playerID: typeof playerIDType,
-  playerServer: typeof playerServerType
-) => { gameState: gameState; playerOutput: playerOutputType } | undefined
+  playerOutput: typeof playerOutputType
+) => { newGameStateClient: gameStateClient; playerOutput: playerOutputType }
 
 export type game = {
   shuffleDeck: shuffleDeck
@@ -97,4 +91,4 @@ export type game = {
 type gameStateRemap = (
   gameState: gameStateClient,
   clientPlayer: playerID
-) => gameState
+) => gameStateServer

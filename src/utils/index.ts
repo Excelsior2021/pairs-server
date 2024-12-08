@@ -1,6 +1,6 @@
 import { playerClient, playerID, playerServer } from "@/enums/index.ts"
 import type {
-  gameState,
+  gameStateServer,
   gameStateRemap as gameStateRemapType,
 } from "@/types/index.d.ts"
 
@@ -8,7 +8,7 @@ export const gameStateRemap: gameStateRemapType = (
   gameStateClient,
   clientPlayer
 ) => {
-  const remappedGameState = <gameState>{}
+  const remappedGameState = <gameStateServer>{}
   let player: playerServer
   let opp: playerServer
 

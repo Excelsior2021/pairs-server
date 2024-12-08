@@ -2,10 +2,10 @@ import type { Server, Socket } from "socket.io"
 import type {
   playerID as playerIDType,
   playerOutput,
-  playerServer as playerServerType,
   socketEvent as socketEventType,
 } from "@/enums/index.ts"
 import type {
+  card,
   game,
   sessions,
   playerRequest as playerRequestType,
@@ -27,6 +27,7 @@ type joinSession = (
   socket: Socket,
   sessions: sessions,
   sessionID: string,
+  deck: card[],
   game: game,
   playerID: typeof playerIDType,
   socketEvent: typeof socketEventType
@@ -48,8 +49,6 @@ type playerMatch = (
   playerMatch: playerMatchType,
   gameStateClient: gameStateClient,
   playerOutput: playerOutput,
-  playerID: typeof playerIDType,
-  playerServer: typeof playerServerType,
   socketEvent: typeof socketEventType
 ) => void
 
@@ -68,8 +67,6 @@ type playerDealt = (
   game: game,
   playerRequest: playerRequestType,
   playerOutputEnum: typeof playerOutput,
-  playerID: typeof playerIDType,
-  playerServer: typeof playerServerType,
   socketEvent: typeof socketEventType
 ) => void
 
