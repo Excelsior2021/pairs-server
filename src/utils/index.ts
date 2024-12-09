@@ -22,7 +22,7 @@ export const gameStateRemap: gameStateRemapType = (
 
   remappedGameState[player] = gameStateClient[playerClient.player]
   remappedGameState[opp] = gameStateClient[playerClient.opponent]
-  remappedGameState.shuffledDeck = gameStateClient.shuffledDeck
+  remappedGameState.deck = gameStateClient.deck
 
   return remappedGameState
 }

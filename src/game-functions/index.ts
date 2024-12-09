@@ -14,7 +14,6 @@ const shuffleDeck: shuffleDeck = deck => {
     deck[x] = deck[y]
     deck[y] = temp
   }
-  return deck
 }
 
 const initialPairs: initialPairs = hand => {
@@ -36,15 +35,16 @@ const initialPairs: initialPairs = hand => {
       if (cardP === cardH) hand.splice(hand.indexOf(cardH), 1)
     })
   )
+
   return pairs
 }
 
 const startGame: startGame = (deck, shuffleDeck, initialPairs) => {
-  const shuffledDeck = shuffleDeck(deck)
-  const initialHandSize: number = 7
+  shuffleDeck(deck)
+  const initialHandSize: number = 7 //declare as function parameter (also on client)
 
-  const player1Hand = shuffledDeck.splice(0, initialHandSize)
-  const player2Hand = shuffledDeck.splice(0, initialHandSize)
+  const player1Hand = deck.splice(0, initialHandSize)
+  const player2Hand = deck.splice(0, initialHandSize)
 
   const player1Pairs = initialPairs(player1Hand)
   const player2Pairs = initialPairs(player2Hand)
@@ -53,9 +53,9 @@ const startGame: startGame = (deck, shuffleDeck, initialPairs) => {
   const player2 = { hand: player2Hand, pairs: player2Pairs }
 
   return {
-    shuffledDeck,
     player1,
     player2,
+    deck,
   }
 }
 
@@ -82,13 +82,13 @@ const handleDealCard: handleDealCard = (
   gameState,
   playerOutput
 ) => {
-  const playerRequestcard = playerRequest.card
-  const dealtcard = gameState.shuffledDeck.pop()!
+  const playerRequestCard = playerRequest.card
+  const dealtCard = gameState.deck.pop()!
 
-  if (playerRequestcard.value === dealtcard.value) {
-    gameState.player.pairs.push(dealtcard, playerRequestcard)
+  if (playerRequestCard.value === dealtCard.value) {
+    gameState.player.pairs.push(dealtCard, playerRequestCard)
     gameState.player.hand = gameState.player.hand.filter(
-      (card: card) => card.id !== playerRequestcard.id
+      (card: card) => card.id !== playerRequestCard.id
     )
     return {
       newGameStateClient: gameState,
@@ -97,8 +97,8 @@ const handleDealCard: handleDealCard = (
   }
 
   for (const card of gameState.player.hand) {
-    if (dealtcard.value === card.value) {
-      gameState.player.pairs.push(dealtcard, card)
+    if (dealtCard.value === card.value) {
+      gameState.player.pairs.push(dealtCard, card)
       gameState.player.hand = gameState.player.hand.filter(
         (cardInHand: card) => cardInHand.id !== card.id
       )
@@ -109,7 +109,7 @@ const handleDealCard: handleDealCard = (
     }
   }
 
-  gameState.player.hand.push(dealtcard)
+  gameState.player.hand.push(dealtCard)
 
   return {
     newGameStateClient: gameState,

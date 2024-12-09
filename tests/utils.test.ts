@@ -1,40 +1,30 @@
-// @ts-nocheck:
 import { expect } from "jsr:@std/expect"
 import { describe, it } from "jsr:@std/testing/bdd"
 import { gameStateRemap } from "@/utils/index.ts"
-import type {
-  card,
-  player,
-  gameState,
-  gameStateClient,
-} from "@/types/index.d.ts"
+import type { card, gameStateServer, gameStateClient } from "@/types/index.d.ts"
 
 describe("utils", () => {
-  const player: player = {
+  const playerMock = {
     hand: [],
     pairs: [],
   }
-  const opponent: player = {
-    hand: [],
-    pairs: [],
-  }
-  const shuffledDeck: card[] = []
+  const deck = <card[]>[]
 
   const initialGameState: gameStateClient = {
-    player,
-    opponent,
-    shuffledDeck,
+    player: playerMock,
+    opponent: playerMock,
+    deck,
   }
 
-  const remappedGameState: gameState = {
-    player1: player,
-    player2: opponent,
-    shuffledDeck,
+  const remappedGameState: gameStateServer = {
+    player1: playerMock,
+    player2: playerMock,
+    deck,
   }
 
   describe("gameStateRemap()", () => {
     const clientPlayer = 1
-    it("returns remmapped game state", () => {
+    it("returns remapped game state", () => {
       expect(gameStateRemap(initialGameState, clientPlayer)).toStrictEqual(
         remappedGameState
       )

@@ -37,16 +37,16 @@ export type playerMatch = {
 type gameStateClient = {
   player: player
   opponent: player
-  shuffledDeck: card[]
+  deck: card[]
 }
 
 export type gameStateServer = {
   player1: player
   player2: player
-  shuffledDeck: card[]
+  deck: card[]
 }
 
-export type shuffleDeck = (deck: card[]) => card[]
+export type shuffleDeck = (deck: card[]) => void
 
 export type initialPairs = (hand: card[]) => card[]
 
@@ -55,7 +55,7 @@ export type startGame = (
   shuffleDeck: shuffleDeck,
   initialPairs: initialPairs
 ) => {
-  shuffledDeck: card[]
+  deck: card[]
   player1: player
   player2: player
 }

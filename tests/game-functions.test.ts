@@ -1,36 +1,34 @@
-// @ts-nocheck
 import { expect } from "jsr:@std/expect"
 import { describe, it, test, beforeEach } from "jsr:@std/testing/bdd"
 import { spy } from "jsr:@std/testing/mock"
 import game from "@/game-functions/index.ts"
-import { playerOutput, playerID, playerServer } from "@/enums/index.ts"
-import mockDeck from "./__mocks__/deck.ts"
-import type { card, gameState, playerRequest } from "@/types/index.d.ts"
+import { playerOutput, suit } from "@/enums/index.ts"
+import type {
+  card,
+  gameStateClient,
+  playerMatch,
+  playerRequest,
+} from "@/types/index.d.ts"
 
 describe("gameFunctions", () => {
-  let deck: card[]
+  let initialGameStateClient: gameStateClient
 
   beforeEach(() => {
-    deck = structuredClone(mockDeck)
-  })
-
-  describe("dealcard()", () => {
-    it("returns the top card of the deck", () => {
-      const topcard = deck[deck.length - 1]
-
-      expect(game.dealcard(deck)).toEqual(topcard)
-    })
-  })
-
-  describe("dealHand()", () => {
-    const handSize = 7
-    it("returns the specified amount of cards for a hand", () => {
-      expect(game.dealHand(deck, handSize)).toHaveLength(handSize)
-    })
+    initialGameStateClient = {
+      player: {
+        hand: [],
+        pairs: [],
+      },
+      opponent: {
+        hand: [],
+        pairs: [],
+      },
+      deck: [],
+    }
   })
 
   describe("initialPairs()", () => {
-    const hand = [
+    const handMock = [
       {
         id: "ace_of_clubs",
         value: "ace",
@@ -49,10 +47,10 @@ describe("gameFunctions", () => {
         suit: "spades",
         img: "./cards/jack_of_spades.webp",
       },
-    ]
+    ] as card[]
 
-    it("returns pairs from hand", () => {
-      const pairs = game.initialPairs(hand)
+    it("returns pairs from handMock", () => {
+      const pairs = game.initialPairs(handMock)
 
       expect(pairs).toStrictEqual([
         {
@@ -69,7 +67,7 @@ describe("gameFunctions", () => {
         },
       ])
 
-      expect(hand).toStrictEqual([
+      expect(handMock).toStrictEqual([
         {
           id: "jack_of_spades",
           value: "jack",
@@ -81,221 +79,233 @@ describe("gameFunctions", () => {
   })
 
   describe("startGame()", () => {
-    const shuffledDeck = <card[]>[{}]
-    const hand = <card[]>[{}],
-      pairs = hand
-    const player1 = { hand, pairs }
-    const player2 = { hand, pairs }
-    const shuffleDeckStub = spy(() => shuffledDeck)
-    const dealHandStub = spy(() => hand)
-    const initialPairsStub = spy(() => pairs)
+    const deckMock = <card[]>[]
+    const handMock = <card[]>[],
+      pairsMock = handMock
+    const player1 = { hand: handMock, pairs: pairsMock }
+    const player2 = { hand: handMock, pairs: pairsMock }
+    const shuffleDeckStub = spy(() => deckMock)
+    const initialPairsStub = spy(() => pairsMock)
     const startGame = game.startGame(
+      deckMock,
       shuffleDeckStub,
-      dealHandStub,
       initialPairsStub
     )
 
     it("returns start game data", () => {
-      expect(startGame).toStrictEqual({ shuffledDeck, player1, player2 })
-    })
-  })
-
-  describe("handlePlayerMatchPairs()", () => {
-    const initialGameState = {
-      player1: {
-        hand: [
-          {
-            id: 1,
-          },
-        ],
-        pairs: [],
-      },
-      player2: {
-        hand: [
-          {
-            id: 1,
-          },
-        ],
-      },
-      deck: [],
-    } as any
-    const playerRequest = {
-      clientPlayer: 1,
-      card: {
-        id: 1,
-      },
-    } as any
-    const playerMatch = {
-      card: {
-        id: 1,
-      },
-    } as any
-
-    it("returns transformed game state after player match", () => {
-      expect(
-        game.handlePlayerMatchPairs(
-          playerRequest,
-          playerMatch,
-          initialGameState,
-          playerID,
-          playerServer
-        )
-      ).toStrictEqual({
-        player1: {
-          hand: [],
-          pairs: [
-            {
-              id: 1,
-            },
-            {
-              id: 1,
-            },
-          ],
-        },
-        player2: {
-          hand: [],
-        },
-        deck: [],
+      expect(startGame).toStrictEqual({
+        player1,
+        player2,
+        deck: deckMock,
       })
     })
   })
 
-  describe("handleDealcard()", () => {
-    let initialGameState = <gameState>{}
-
-    beforeEach(() => {
-      initialGameState = {
-        player1: {
-          hand: [
-            {
-              id: 1,
-              value: 1,
-            },
-            {
-              id: 2,
-              value: 2,
-            },
-          ],
-          pairs: <card[]>[],
-        },
-        shuffledDeck: <card[]>[{}],
-      }
-    })
-
+  describe("handlePlayerMatchPairs()", () => {
     const playerRequest = {
       clientPlayer: 1,
       card: {
-        id: 1,
+        id: "id",
+      },
+    } as playerRequest
+
+    const playerMatch = {
+      clientPlayer: 2,
+      card: {
+        id: "id",
+      },
+    } as playerMatch
+
+    const outputMock = {
+      player: {
+        hand: [],
+        pairs: [],
+      },
+      opponent: {
+        hand: [],
+        pairs: [
+          {
+            id: "id",
+          },
+          {
+            id: "id",
+          },
+        ],
+      },
+      deck: [],
+    }
+
+    it("returns new game state after player match", () => {
+      expect(
+        game.handlePlayerMatchPairs(
+          playerRequest,
+          playerMatch,
+          initialGameStateClient
+        )
+      ).toStrictEqual(outputMock)
+    })
+  })
+
+  describe("handleDealCard()", () => {
+    const playerRequest = {
+      clientPlayer: 1,
+      card: {
+        id: "1x",
         value: 1,
+        suit: suit.clubs,
+        img: "",
       },
     } as playerRequest
 
     test("match with dealt card", () => {
-      const gameState = {
-        player1: {
-          hand: [
-            {
-              id: 2,
-              value: 2,
-            },
-          ],
+      initialGameStateClient.player.hand = [
+        {
+          id: "1x",
+          value: 1,
+          suit: suit.clubs,
+          img: "",
+        },
+      ]
+
+      initialGameStateClient.deck = [
+        {
+          id: "1y",
+          value: 1,
+          suit: suit.clubs,
+          img: "",
+        },
+      ]
+
+      const newGameStateClient = {
+        ...initialGameStateClient,
+        player: {
+          hand: [],
           pairs: [
             {
-              id: 1,
+              id: "1y",
               value: 1,
+              suit: suit.clubs,
+              img: "",
             },
             {
-              id: 1,
+              id: "1x",
               value: 1,
+              suit: suit.clubs,
+              img: "",
             },
           ],
         },
-        shuffledDeck: <card[]>[{}],
+        deck: [],
       }
 
-      const dealcard = spy(() => ({ id: 1, value: 1 }))
-
       expect(
-        game.handleDealcard(
-          playerRequest,
-          initialGameState,
-          dealcard,
-          playerOutput,
-          playerID,
-          playerServer
-        )
-      ).toStrictEqual({ gameState, playerOutput: playerOutput.DealtcardMatch })
+        game.handleDealCard(playerRequest, initialGameStateClient, playerOutput)
+      ).toStrictEqual({
+        newGameStateClient,
+        playerOutput: playerOutput.DealtcardMatch,
+      })
     })
 
     test("match with card in hand", () => {
-      const gameState = {
-        player1: {
-          hand: [
-            {
-              id: 1,
-              value: 1,
-            },
-          ],
+      initialGameStateClient.player = {
+        hand: [
+          {
+            id: "2x",
+            value: 2,
+            suit: suit.clubs,
+            img: "",
+          },
+        ],
+        pairs: [],
+      }
+
+      initialGameStateClient.deck = [
+        {
+          id: "2y",
+          value: 2,
+          suit: suit.clubs,
+          img: "",
+        },
+      ]
+
+      const newGameStateClient = {
+        ...initialGameStateClient,
+        player: {
+          hand: [],
           pairs: [
             {
-              id: 2,
+              id: "2y",
               value: 2,
+              suit: suit.clubs,
+              img: "",
             },
             {
-              id: 2,
+              id: "2x",
               value: 2,
+              suit: suit.clubs,
+              img: "",
             },
           ],
         },
-        shuffledDeck: <card[]>[{}],
+
+        deck: [],
       }
-      const dealcard = spy(() => ({ id: 2, value: 2 }))
+
       expect(
-        game.handleDealcard(
-          playerRequest,
-          initialGameState,
-          dealcard,
-          playerOutput,
-          playerID,
-          playerServer
-        )
-      ).toStrictEqual({ gameState, playerOutput: playerOutput.HandMatch })
+        game.handleDealCard(playerRequest, initialGameStateClient, playerOutput)
+      ).toStrictEqual({
+        newGameStateClient,
+        playerOutput: playerOutput.HandMatch,
+      })
     })
 
     test("dealt card is added to player's hand", () => {
-      const gameState = {
-        player1: {
+      initialGameStateClient.player.hand = [
+        {
+          id: "1x",
+          value: 1,
+          suit: suit.clubs,
+          img: "",
+        },
+      ]
+
+      initialGameStateClient.deck = [
+        {
+          id: "2x",
+          value: 2,
+          suit: suit.clubs,
+          img: "",
+        },
+      ]
+
+      const newGameStateClient = {
+        ...initialGameStateClient,
+        player: {
           hand: [
             {
-              id: 1,
+              id: "1x",
               value: 1,
+              suit: suit.clubs,
+              img: "",
             },
             {
-              id: 2,
+              id: "2x",
               value: 2,
-            },
-            {
-              id: 3,
-              value: 3,
+              suit: suit.clubs,
+              img: "",
             },
           ],
           pairs: [],
         },
-        shuffledDeck: <card[]>[{}],
+        deck: [],
       }
 
-      const dealcard = spy(() => ({ id: 3, value: 3 }))
-
       expect(
-        game.handleDealcard(
-          playerRequest,
-          initialGameState,
-          dealcard,
-          playerOutput,
-          playerID,
-          playerServer
-        )
-      ).toStrictEqual({ gameState, playerOutput: playerOutput.NoMatch })
+        game.handleDealCard(playerRequest, initialGameStateClient, playerOutput)
+      ).toStrictEqual({
+        newGameStateClient,
+        playerOutput: playerOutput.NoMatch,
+      })
     })
   })
 })
