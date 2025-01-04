@@ -45,7 +45,7 @@ io.on(socketEvent.connectiton, socket => {
       socket,
       sessions,
       sessionID,
-      deck,
+      [...deck],
       game,
       socketEvent
     )
