@@ -18,9 +18,9 @@ export enum nonNumValue {
   king = "king",
 }
 
-export enum playerID {
-  player1 = 1,
-  player2,
+export enum PlayerID {
+  P1 = 1,
+  P2,
 }
 
 export enum playerServer {
@@ -37,7 +37,6 @@ export enum socketEvent {
   connectiton = "connection",
   create_session = "create_session",
   join_session = "join_session",
-  set_player = "set_player",
   sessionID_exists = "sessionID_exists",
   no_sessionID = "no_sessionID",
   start = "start",

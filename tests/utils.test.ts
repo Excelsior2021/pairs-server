@@ -23,9 +23,9 @@ describe("utils", () => {
   }
 
   describe("gameStateRemap()", () => {
-    const clientPlayer = 1
+    const playerID = 1
     it("returns remapped game state", () => {
-      expect(gameStateRemap(initialGameState, clientPlayer)).toStrictEqual(
+      expect(gameStateRemap(initialGameState, playerID)).toStrictEqual(
         remappedGameState
       )
     })

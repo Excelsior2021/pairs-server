@@ -1,9 +1,8 @@
 import type {
   nonNumValue,
-  playerID as playerIDType,
+  PlayerID,
   playerOutput as playerOutputType,
   suit as suitType,
-  playerID,
 } from "@/enums/index.ts"
 
 export type card = {
@@ -25,12 +24,12 @@ export type sessions = {
 }
 
 export type playerRequest = {
-  clientPlayer: playerIDType
+  playerID: PlayerID
   card: card
 }
 
 export type playerMatch = {
-  clientPlayer: playerIDType
+  playerID: PlayerID
   card: card
 }
 
@@ -82,5 +81,5 @@ export type game = {
 
 type gameStateRemap = (
   gameState: gameStateClient,
-  clientPlayer: playerID
+  playerID: PlayerID
 ) => gameStateServer

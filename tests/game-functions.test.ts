@@ -103,14 +103,14 @@ describe("gameFunctions", () => {
 
   describe("handlePlayerMatchPairs()", () => {
     const playerRequest = {
-      clientPlayer: 1,
+      playerID: 1,
       card: {
         id: "id",
       },
     } as playerRequest
 
     const playerMatch = {
-      clientPlayer: 2,
+      playerID: 2,
       card: {
         id: "id",
       },
@@ -148,7 +148,7 @@ describe("gameFunctions", () => {
 
   describe("handleDealCard()", () => {
     const playerRequest = {
-      clientPlayer: 1,
+      playerID: 1,
       card: {
         id: "1x",
         value: 1,

@@ -5,7 +5,7 @@ import game from "@/game-functions/index.ts"
 import { gameStateRemap } from "@/utils/index.ts"
 import {
   playerOutput as playerOutputEnum,
-  playerID,
+  PlayerID,
   socketEvent,
   playerOutput,
 } from "@/enums/index.ts"
@@ -35,7 +35,7 @@ io.on(socketEvent.connectiton, socket => {
 
   //creates a session for socket
   socket.on(socketEvent.create_session, (sessionID: string) =>
-    eventCb.createSession(socket, sessions, sessionID, playerID, socketEvent)
+    eventCb.createSession(socket, sessions, sessionID)
   )
 
   //socket joins existing session and game starts
@@ -47,7 +47,6 @@ io.on(socketEvent.connectiton, socket => {
       sessionID,
       deck,
       game,
-      playerID,
       socketEvent
     )
   )
@@ -122,7 +121,7 @@ io.on(socketEvent.connectiton, socket => {
 
   socket.on(
     socketEvent.player_turn_switch,
-    (sessionID: string, playerTurn: playerID) =>
+    (sessionID: string, playerTurn: PlayerID) =>
       eventCb.playerTurnSwitch(socket, sessionID, playerTurn, socketEvent)
   )
 

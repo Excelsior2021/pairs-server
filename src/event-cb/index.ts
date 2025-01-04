@@ -10,16 +10,9 @@ import type {
   playerTurnSwitch,
 } from "@/types/event-cb.d.ts"
 
-const createSession: createSession = (
-  socket,
-  sessions,
-  sessionID,
-  playerID,
-  socketEvent
-) => {
+const createSession: createSession = (socket, sessions, sessionID) => {
   sessions[sessionID] = { playerSocketsIDs: [socket.id] }
   socket.join(sessionID)
-  socket.emit(socketEvent.set_player, playerID.player1)
   console.log(sessions)
 }
 
@@ -30,7 +23,6 @@ const joinSession: joinSession = (
   sessionID,
   deck,
   game,
-  playerID,
   socketEvent
 ) => {
   const session = sessions[sessionID]
@@ -43,7 +35,6 @@ const joinSession: joinSession = (
       game.shuffleDeck,
       game.initialPairs
     )
-    socket.emit(socketEvent.set_player, playerID.player2)
     const playerTurn = Math.ceil(Math.random() * 2)
     io.sockets
       .in(sessionID)
@@ -81,7 +72,7 @@ const playerMatch: playerMatch = (
 
     const gameStateServer = gameStateRemap(
       newGameStateClient,
-      playerMatch.clientPlayer
+      playerMatch.playerID
     )
 
     io.sockets
@@ -90,7 +81,7 @@ const playerMatch: playerMatch = (
         socketEvent.player_match,
         gameStateServer,
         playerOutput,
-        playerRequest.clientPlayer
+        playerRequest.playerID
       )
   } catch (error) {
     console.error(error)
@@ -122,7 +113,7 @@ const playerDealt: playerDealt = (
 
   const gameStateServer = gameStateRemap(
     newGameStateClient,
-    playerRequest.clientPlayer
+    playerRequest.playerID
   )
 
   io.sockets
@@ -131,7 +122,7 @@ const playerDealt: playerDealt = (
       socketEvent.player_dealt,
       gameStateServer,
       playerOutput,
-      playerRequest.clientPlayer
+      playerRequest.playerID
     )
 }
 

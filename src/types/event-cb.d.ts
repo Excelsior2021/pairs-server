@@ -1,6 +1,6 @@
 import type { Server, Socket } from "socket.io"
 import type {
-  playerID as playerIDType,
+  PlayerID,
   playerOutput,
   socketEvent as socketEventType,
 } from "@/enums/index.ts"
@@ -17,9 +17,7 @@ import type {
 type createSession = (
   socket: Socket,
   sessions: sessions,
-  sessionID: string,
-  playerID: typeof playerIDType,
-  socketEvent: typeof socketEventType
+  sessionID: string
 ) => void
 
 type joinSession = (
@@ -29,7 +27,6 @@ type joinSession = (
   sessionID: string,
   deck: card[],
   game: game,
-  playerID: typeof playerIDType,
   socketEvent: typeof socketEventType
 ) => void
 
@@ -80,7 +77,7 @@ type playerResponseMessage = (
 type playerTurnSwitch = (
   socket: Socket,
   sessionID: string,
-  playerTurn: playerIDType,
+  playerTurn: PlayerID,
   socketEvent: typeof socketEventType
 ) => void
 

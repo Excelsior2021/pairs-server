@@ -1,4 +1,4 @@
-import { playerClient, playerID, playerServer } from "@/enums/index.ts"
+import { playerClient, PlayerID, playerServer } from "@/enums/index.ts"
 import type {
   gameStateServer,
   gameStateRemap as gameStateRemapType,
@@ -6,19 +6,19 @@ import type {
 
 export const gameStateRemap: gameStateRemapType = (
   gameStateClient,
-  clientPlayer
+  playerID
 ) => {
   const remappedGameState = <gameStateServer>{}
   let player: playerServer
   let opp: playerServer
 
-  if (clientPlayer === playerID.player1) {
+  if (playerID === PlayerID.P1) {
     player = playerServer.player1
     opp = playerServer.player2
-  } else if (clientPlayer === playerID.player2) {
+  } else if (playerID === PlayerID.P2) {
     player = playerServer.player2
     opp = playerServer.player1
-  } else throw new Error("clientPlayer can not be determined")
+  } else throw new Error("playerID can not be determined")
 
   remappedGameState[player] = gameStateClient[playerClient.player]
   remappedGameState[opp] = gameStateClient[playerClient.opponent]
