@@ -28,7 +28,7 @@ const joinSession: joinSession = (
   const session = sessions[sessionID]
   if (session) {
     socket.join(sessionID)
-    socket.emit(socketEvent.sessionID_exists)
+    socket.emit(socketEvent.sessionID_exists, sessionID)
     session.playerSocketsIDs.push(socket.id)
     const initialGameState = game.startGame(
       deck,
@@ -38,7 +38,7 @@ const joinSession: joinSession = (
     const playerTurn = Math.ceil(Math.random() * 2)
     io.sockets
       .in(sessionID)
-      .emit(socketEvent.start, initialGameState, playerTurn, sessionID)
+      .emit(socketEvent.start, initialGameState, playerTurn)
   }
   //if requested session ID does not exist
   else socket.emit(socketEvent.no_sessionID)
@@ -75,13 +75,16 @@ const playerMatch: playerMatch = (
       playerMatch.playerID
     )
 
+    const gameOver = game.isGameOver(newGameStateClient)
+
     io.sockets
       .in(sessionID)
       .emit(
         socketEvent.player_match,
         gameStateServer,
         playerOutput,
-        playerRequest.playerID
+        playerRequest.playerID,
+        gameOver
       )
   } catch (error) {
     console.error(error)
@@ -116,13 +119,16 @@ const playerDealt: playerDealt = (
     playerRequest.playerID
   )
 
+  const gameOver = game.isGameOver(newGameStateClient)
+
   io.sockets
     .in(sessionID)
     .emit(
       socketEvent.player_dealt,
       gameStateServer,
       playerOutput,
-      playerRequest.playerID
+      playerRequest.playerID,
+      gameOver
     )
 }
 

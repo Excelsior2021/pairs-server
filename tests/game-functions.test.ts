@@ -2,7 +2,7 @@ import { expect } from "jsr:@std/expect"
 import { describe, it, test, beforeEach } from "jsr:@std/testing/bdd"
 import { spy } from "jsr:@std/testing/mock"
 import game from "@/game-functions/index.ts"
-import { playerOutput, suit } from "@/enums/index.ts"
+import { playerOutput, Suit } from "@/enums/index.ts"
 import type {
   card,
   gameStateClient,
@@ -152,7 +152,7 @@ describe("gameFunctions", () => {
       card: {
         id: "1x",
         value: 1,
-        suit: suit.clubs,
+        suit: Suit.clubs,
         img: "",
       },
     } as playerRequest
@@ -162,7 +162,7 @@ describe("gameFunctions", () => {
         {
           id: "1x",
           value: 1,
-          suit: suit.clubs,
+          suit: Suit.clubs,
           img: "",
         },
       ]
@@ -171,7 +171,7 @@ describe("gameFunctions", () => {
         {
           id: "1y",
           value: 1,
-          suit: suit.clubs,
+          suit: Suit.clubs,
           img: "",
         },
       ]
@@ -184,13 +184,13 @@ describe("gameFunctions", () => {
             {
               id: "1y",
               value: 1,
-              suit: suit.clubs,
+              suit: Suit.clubs,
               img: "",
             },
             {
               id: "1x",
               value: 1,
-              suit: suit.clubs,
+              suit: Suit.clubs,
               img: "",
             },
           ],
@@ -212,7 +212,7 @@ describe("gameFunctions", () => {
           {
             id: "2x",
             value: 2,
-            suit: suit.clubs,
+            suit: Suit.clubs,
             img: "",
           },
         ],
@@ -223,7 +223,7 @@ describe("gameFunctions", () => {
         {
           id: "2y",
           value: 2,
-          suit: suit.clubs,
+          suit: Suit.clubs,
           img: "",
         },
       ]
@@ -236,13 +236,13 @@ describe("gameFunctions", () => {
             {
               id: "2y",
               value: 2,
-              suit: suit.clubs,
+              suit: Suit.clubs,
               img: "",
             },
             {
               id: "2x",
               value: 2,
-              suit: suit.clubs,
+              suit: Suit.clubs,
               img: "",
             },
           ],
@@ -264,7 +264,7 @@ describe("gameFunctions", () => {
         {
           id: "1x",
           value: 1,
-          suit: suit.clubs,
+          suit: Suit.clubs,
           img: "",
         },
       ]
@@ -273,7 +273,7 @@ describe("gameFunctions", () => {
         {
           id: "2x",
           value: 2,
-          suit: suit.clubs,
+          suit: Suit.clubs,
           img: "",
         },
       ]
@@ -285,13 +285,13 @@ describe("gameFunctions", () => {
             {
               id: "1x",
               value: 1,
-              suit: suit.clubs,
+              suit: Suit.clubs,
               img: "",
             },
             {
               id: "2x",
               value: 2,
-              suit: suit.clubs,
+              suit: Suit.clubs,
               img: "",
             },
           ],

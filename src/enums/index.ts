@@ -4,7 +4,7 @@ export enum playerOutput {
   NoMatch,
 }
 
-export enum suit {
+export enum Suit {
   clubs = "clubs",
   diamonds = "diamonds",
   hearts = "hearts",

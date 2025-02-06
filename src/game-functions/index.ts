@@ -5,6 +5,7 @@ import type {
   startGame,
   handlePlayerMatchPairs,
   handleDealCard,
+  isGameOver,
 } from "@/types/index.d.ts"
 
 const shuffleDeck: shuffleDeck = deck => {
@@ -117,10 +118,23 @@ const handleDealCard: handleDealCard = (
   }
 }
 
+const isGameOver: isGameOver = gameState => {
+  const { player, opponent, deck } = gameState
+
+  if (
+    player.hand.length === 0 ||
+    opponent.hand.length === 0 ||
+    deck.length === 0
+  )
+    return true
+  return false
+}
+
 export default {
   shuffleDeck,
   initialPairs,
   startGame,
   handlePlayerMatchPairs,
   handleDealCard,
+  isGameOver,
 }

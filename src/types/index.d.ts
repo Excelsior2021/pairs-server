@@ -2,13 +2,13 @@ import type {
   nonNumValue,
   PlayerID,
   playerOutput as playerOutputType,
-  suit as suitType,
+  Suit as SuitType,
 } from "@/enums/index.ts"
 
 export type card = {
   id: string
   value: nonNumValue | number
-  suit: suitType
+  suit: SuitType
   img: string
 }
 
@@ -71,12 +71,15 @@ export type handleDealCard = (
   playerOutput: typeof playerOutputType
 ) => { newGameStateClient: gameStateClient; playerOutput: playerOutputType }
 
+export type isGameOver = (gameState: gameStateClient) => boolean
+
 export type game = {
   shuffleDeck: shuffleDeck
   initialPairs: initialPairs
   startGame: startGame
   handlePlayerMatchPairs: handlePlayerMatchPairs
   handleDealCard: handleDealCard
+  isGameOver: isGameOver
 }
 
 type gameStateRemap = (
