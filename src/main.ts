@@ -4,10 +4,10 @@ import deck from "@/deck/index.ts"
 import game from "@/game-functions/index.ts"
 import { gameStateRemap } from "@/utils/index.ts"
 import {
-  playerOutput as playerOutputEnum,
+  PlayerOutput as playerOutputEnum,
   PlayerID,
-  socketEvent,
-  playerOutput,
+  SocketEvent,
+  PlayerOutput,
 } from "@/enums/index.ts"
 import "@std/dotenv/load"
 import type {
@@ -30,16 +30,16 @@ console.log(`listening on port: ${port}`)
 //in-memory storage of sessions
 const sessions: sessions = {}
 
-io.on(socketEvent.connectiton, socket => {
+io.on(SocketEvent.connectiton, socket => {
   console.log(`socket ${socket.id} connected`)
 
   //creates a session for socket
-  socket.on(socketEvent.create_session, (sessionID: string) =>
+  socket.on(SocketEvent.create_session, (sessionID: string) =>
     eventCb.createSession(socket, sessions, sessionID)
   )
 
   //socket joins existing session and game starts
-  socket.on(socketEvent.join_session, (sessionID: string) =>
+  socket.on(SocketEvent.join_session, (sessionID: string) =>
     eventCb.joinSession(
       io,
       socket,
@@ -47,25 +47,25 @@ io.on(socketEvent.connectiton, socket => {
       sessionID,
       structuredClone(deck),
       game,
-      socketEvent
+      SocketEvent
     )
   )
 
   //card request from player to opponent
   socket.on(
-    socketEvent.player_request,
+    SocketEvent.player_request,
     (playerRequest: playerRequest, sessionID: string) =>
-      eventCb.playerRequest(socket, sessionID, playerRequest, socketEvent)
+      eventCb.playerRequest(socket, sessionID, playerRequest, SocketEvent)
   )
 
   //player has a match with opponent
   socket.on(
-    socketEvent.player_match,
+    SocketEvent.player_match,
     (
       playerRequest: playerRequest,
       playerMatch: playerMatch,
       gameStateClient: gameStateClient,
-      playerOutput: number,
+      PlayerOutput: number,
       sessionID: string
     ) =>
       eventCb.playerMatch(
@@ -76,21 +76,21 @@ io.on(socketEvent.connectiton, socket => {
         playerRequest,
         playerMatch,
         gameStateClient,
-        playerOutput,
-        socketEvent
+        PlayerOutput,
+        SocketEvent
       )
   )
 
   //player does not have a match with opponent
   socket.on(
-    socketEvent.no_player_match,
+    SocketEvent.no_player_match,
     (playerRequest: playerRequest, sessionID: string) =>
-      eventCb.noPlayerMatch(socket, sessionID, playerRequest, socketEvent)
+      eventCb.noPlayerMatch(socket, sessionID, playerRequest, SocketEvent)
   )
 
   //player deals card from the deck
   socket.on(
-    socketEvent.player_dealt,
+    SocketEvent.player_dealt,
     (
       playerRequest: playerRequest,
       gameStateClient: gameStateClient,
@@ -104,29 +104,29 @@ io.on(socketEvent.connectiton, socket => {
         game,
         playerRequest,
         playerOutputEnum,
-        socketEvent
+        SocketEvent
       )
   )
 
   socket.on(
-    socketEvent.player_response_message,
-    (playerOutput: playerOutput, sessionID: string) =>
+    SocketEvent.player_response_message,
+    (PlayerOutput: PlayerOutput, sessionID: string) =>
       eventCb.playerResponseMessage(
         socket,
         sessionID,
-        playerOutput,
-        socketEvent
+        PlayerOutput,
+        SocketEvent
       )
   )
 
   socket.on(
-    socketEvent.player_turn_switch,
+    SocketEvent.player_turn_switch,
     (sessionID: string, playerTurn: PlayerID) =>
-      eventCb.playerTurnSwitch(socket, sessionID, playerTurn, socketEvent)
+      eventCb.playerTurnSwitch(socket, sessionID, playerTurn, SocketEvent)
   )
 
   //remove socket from playerSocketsIDs and delete session
-  socket.on(socketEvent.disconnect, () =>
-    eventCb.disconnect(socket, sessions, socketEvent)
+  socket.on(SocketEvent.disconnect, () =>
+    eventCb.disconnect(socket, sessions, SocketEvent)
   )
 })

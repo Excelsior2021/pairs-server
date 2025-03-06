@@ -1,8 +1,8 @@
 import type { Server, Socket } from "socket.io"
 import type {
   PlayerID,
-  playerOutput,
-  socketEvent as socketEventType,
+  PlayerOutput,
+  SocketEvent as SocketEventType,
 } from "@/enums/index.ts"
 import type {
   card,
@@ -27,14 +27,14 @@ type joinSession = (
   sessionID: string,
   deck: card[],
   game: game,
-  socketEvent: typeof socketEventType
+  SocketEvent: typeof SocketEventType
 ) => void
 
 type playerRequest = (
   socket: Socket,
   sessionID: string,
   playerRequest: playerRequestType,
-  socketEvent: typeof socketEventType
+  SocketEvent: typeof SocketEventType
 ) => void
 
 type playerMatch = (
@@ -45,15 +45,15 @@ type playerMatch = (
   playerRequestObj: playerRequestType,
   playerMatch: playerMatchType,
   gameStateClient: gameStateClient,
-  playerOutput: playerOutput,
-  socketEvent: typeof socketEventType
+  PlayerOutput: PlayerOutput,
+  SocketEvent: typeof SocketEventType
 ) => void
 
 type noPlayerMatch = (
   socket: Socket,
   sessionID: string,
   playerRequest: playerRequestType,
-  socketEvent: typeof socketEventType
+  SocketEvent: typeof SocketEventType
 ) => void
 
 type playerDealt = (
@@ -63,26 +63,26 @@ type playerDealt = (
   gameStateClient: gameStateClient,
   game: game,
   playerRequest: playerRequestType,
-  playerOutputEnum: typeof playerOutput,
-  socketEvent: typeof socketEventType
+  playerOutputEnum: typeof PlayerOutput,
+  SocketEvent: typeof SocketEventType
 ) => void
 
 type playerResponseMessage = (
   socket: Socket,
   sessionID: string,
-  playerOutput: playerOutput,
-  socketEvent: typeof socketEventType
+  PlayerOutput: PlayerOutput,
+  SocketEvent: typeof SocketEventType
 ) => void
 
 type playerTurnSwitch = (
   socket: Socket,
   sessionID: string,
   playerTurn: PlayerID,
-  socketEvent: typeof socketEventType
+  SocketEvent: typeof SocketEventType
 ) => void
 
 type disconnect = (
   socket: Socket,
   sessions: sessions,
-  socketEvent: typeof socketEventType
+  SocketEvent: typeof SocketEventType
 ) => void

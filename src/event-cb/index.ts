@@ -23,12 +23,12 @@ const joinSession: joinSession = (
   sessionID,
   deck,
   game,
-  socketEvent
+  SocketEvent
 ) => {
   const session = sessions[sessionID]
   if (session) {
     socket.join(sessionID)
-    socket.emit(socketEvent.sessionID_exists, sessionID)
+    socket.emit(SocketEvent.sessionID_exists, sessionID)
     session.playerSocketsIDs.push(socket.id)
     const initialGameState = game.startGame(
       deck,
@@ -38,10 +38,10 @@ const joinSession: joinSession = (
     const playerTurn = Math.ceil(Math.random() * 2)
     io.sockets
       .in(sessionID)
-      .emit(socketEvent.start, initialGameState, playerTurn)
+      .emit(SocketEvent.start, initialGameState, playerTurn)
   }
   //if requested session ID does not exist
-  else socket.emit(socketEvent.no_sessionID)
+  else socket.emit(SocketEvent.no_sessionID)
   console.log(`sessions: ${JSON.stringify(sessions)}`)
 }
 
@@ -49,8 +49,8 @@ const playerRequest: playerRequest = (
   socket,
   sessionID,
   playerRequest,
-  socketEvent
-) => socket.to(sessionID).emit(socketEvent.player_requested, playerRequest)
+  SocketEvent
+) => socket.to(sessionID).emit(SocketEvent.player_requested, playerRequest)
 
 const playerMatch: playerMatch = (
   io,
@@ -60,8 +60,8 @@ const playerMatch: playerMatch = (
   playerRequest,
   playerMatch,
   gameStateClient,
-  playerOutput,
-  socketEvent
+  PlayerOutput,
+  SocketEvent
 ) => {
   try {
     const newGameStateClient = game.handlePlayerMatchPairs(
@@ -80,9 +80,9 @@ const playerMatch: playerMatch = (
     io.sockets
       .in(sessionID)
       .emit(
-        socketEvent.player_match,
+        SocketEvent.player_match,
         gameStateServer,
-        playerOutput,
+        PlayerOutput,
         playerRequest.playerID,
         gameOver
       )
@@ -95,8 +95,8 @@ const noPlayerMatch: noPlayerMatch = (
   socket,
   sessionID,
   playerRequest,
-  socketEvent
-) => socket.to(sessionID).emit(socketEvent.player_to_deal, playerRequest)
+  SocketEvent
+) => socket.to(sessionID).emit(SocketEvent.player_to_deal, playerRequest)
 
 const playerDealt: playerDealt = (
   io,
@@ -106,9 +106,9 @@ const playerDealt: playerDealt = (
   game,
   playerRequest,
   playerOutputEnum,
-  socketEvent
+  SocketEvent
 ) => {
-  const { newGameStateClient, playerOutput } = game.handleDealCard(
+  const { newGameStateClient, PlayerOutput } = game.handleDealCard(
     playerRequest,
     gameStateClient,
     playerOutputEnum
@@ -124,9 +124,9 @@ const playerDealt: playerDealt = (
   io.sockets
     .in(sessionID)
     .emit(
-      socketEvent.player_dealt,
+      SocketEvent.player_dealt,
       gameStateServer,
-      playerOutput,
+      PlayerOutput,
       playerRequest.playerID,
       gameOver
     )
@@ -135,22 +135,22 @@ const playerDealt: playerDealt = (
 const playerResponseMessage: playerResponseMessage = (
   socket,
   sessionID,
-  playerOutput,
-  socketEvent
+  PlayerOutput,
+  SocketEvent
 ) =>
-  socket.to(sessionID).emit(socketEvent.player_response_message, playerOutput)
+  socket.to(sessionID).emit(SocketEvent.player_response_message, PlayerOutput)
 
 const playerTurnSwitch: playerTurnSwitch = (
   socket,
   sessionID,
   playerTurn,
-  socketEvent
-) => socket.to(sessionID).emit(socketEvent.player_turn_switch, playerTurn)
+  SocketEvent
+) => socket.to(sessionID).emit(SocketEvent.player_turn_switch, playerTurn)
 
-const disconnect: disconnect = (socket, sessions, socketEvent) => {
+const disconnect: disconnect = (socket, sessions, SocketEvent) => {
   for (const session in sessions)
     if (sessions[session].playerSocketsIDs.includes(socket.id)) {
-      socket.to(session).emit(socketEvent.player_disconnected)
+      socket.to(session).emit(SocketEvent.player_disconnected)
       delete sessions[session]
     }
 

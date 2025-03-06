@@ -81,7 +81,7 @@ const handlePlayerMatchPairs: handlePlayerMatchPairs = (
 const handleDealCard: handleDealCard = (
   playerRequest,
   gameState,
-  playerOutput
+  PlayerOutput
 ) => {
   const playerRequestCard = playerRequest.card
   const dealtCard = gameState.deck.pop()!
@@ -93,7 +93,7 @@ const handleDealCard: handleDealCard = (
     )
     return {
       newGameStateClient: gameState,
-      playerOutput: playerOutput.DealtcardMatch,
+      PlayerOutput: PlayerOutput.DealtcardMatch,
     }
   }
 
@@ -105,7 +105,7 @@ const handleDealCard: handleDealCard = (
       )
       return {
         newGameStateClient: gameState,
-        playerOutput: playerOutput.HandMatch,
+        PlayerOutput: PlayerOutput.HandMatch,
       }
     }
   }
@@ -114,7 +114,7 @@ const handleDealCard: handleDealCard = (
 
   return {
     newGameStateClient: gameState,
-    playerOutput: playerOutput.NoMatch,
+    PlayerOutput: PlayerOutput.NoMatch,
   }
 }
 

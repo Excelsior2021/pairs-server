@@ -1,4 +1,4 @@
-export enum playerOutput {
+export enum PlayerOutput {
   DealtcardMatch = 1,
   HandMatch,
   NoMatch,
@@ -11,7 +11,7 @@ export enum Suit {
   spades = "spades",
 }
 
-export enum nonNumValue {
+export enum NonNumValue {
   ace = "ace",
   jack = "jack",
   queen = "queen",
@@ -23,17 +23,17 @@ export enum PlayerID {
   P2,
 }
 
-export enum playerServer {
+export enum PlayerServer {
   player1 = "player1",
   player2 = "player2",
 }
 
-export enum playerClient {
+export enum PlayerClient {
   player = "player",
   opponent = "opponent",
 }
 
-export enum socketEvent {
+export enum SocketEvent {
   connectiton = "connection",
   create_session = "create_session",
   join_session = "join_session",

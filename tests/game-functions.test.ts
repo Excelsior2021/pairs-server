@@ -2,7 +2,7 @@ import { expect } from "jsr:@std/expect"
 import { describe, it, test, beforeEach } from "jsr:@std/testing/bdd"
 import { spy } from "jsr:@std/testing/mock"
 import game from "@/game-functions/index.ts"
-import { playerOutput, Suit } from "@/enums/index.ts"
+import { PlayerOutput, Suit } from "@/enums/index.ts"
 import type {
   card,
   gameStateClient,
@@ -199,10 +199,10 @@ describe("gameFunctions", () => {
       }
 
       expect(
-        game.handleDealCard(playerRequest, initialGameStateClient, playerOutput)
+        game.handleDealCard(playerRequest, initialGameStateClient, PlayerOutput)
       ).toStrictEqual({
         newGameStateClient,
-        playerOutput: playerOutput.DealtcardMatch,
+        PlayerOutput: PlayerOutput.DealtcardMatch,
       })
     })
 
@@ -252,10 +252,10 @@ describe("gameFunctions", () => {
       }
 
       expect(
-        game.handleDealCard(playerRequest, initialGameStateClient, playerOutput)
+        game.handleDealCard(playerRequest, initialGameStateClient, PlayerOutput)
       ).toStrictEqual({
         newGameStateClient,
-        playerOutput: playerOutput.HandMatch,
+        PlayerOutput: PlayerOutput.HandMatch,
       })
     })
 
@@ -301,10 +301,10 @@ describe("gameFunctions", () => {
       }
 
       expect(
-        game.handleDealCard(playerRequest, initialGameStateClient, playerOutput)
+        game.handleDealCard(playerRequest, initialGameStateClient, PlayerOutput)
       ).toStrictEqual({
         newGameStateClient,
-        playerOutput: playerOutput.NoMatch,
+        PlayerOutput: PlayerOutput.NoMatch,
       })
     })
   })
